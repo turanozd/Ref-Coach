@@ -7,130 +7,328 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Ref Coach Pro</title>
     
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlJlZiBDb2FjaCBQcm8iLAogICJzaG9ydF9uYW1lIjogIlJlZkxvZ2dlciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBmMTcyYSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzgwNy84MDczNjcucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlJlZiBDb2FjaCBQcm8iLAogICJzaG9ydF9uYW1lIjogIlJlZkxvZ2dlciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAmZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBmMTcyYSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzgwNy84MDczNjcucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         button { touch-action: manipulation; transition: all 0.1s ease; }
         button:active { transform: scale(0.95); opacity: 0.8; }
         .selected { background-color: #3b82f6 !important; color: white !important; border-color: #2563eb !important; }
-        .diff-selected { background-color: #1e293b !important; color: white !important; border-color: #0f172a !important; }
+        .diff-selected { background-color: #475569 !important; color: white !important; border-color: #94a3b8 !important; }
         .cmi-selected { background-color: #ef4444 !important; color: white !important; border-color: #dc2626 !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
-        .hidden { display: none; }
         
-        .field-canvas { position: relative; width: 100%; height: 180px; background: #22c55e; border: 2px solid white; border-radius: 6px; }
-        .field-line { position: absolute; border: 1.5px solid rgba(255,255,255,0.9); pointer-events: none; }
+        .field-canvas { position: relative; width: 100%; height: 180px; background: #16a34a; border: 2px solid rgba(255,255,255,0.6); border-radius: 6px; cursor: crosshair; }
+        .field-line { position: absolute; border: 1.5px solid rgba(255,255,255,0.6); pointer-events: none; }
         .half-line { left: 50%; top: 0; bottom: 0; width: 0; }
         .center-circle { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 45px; height: 45px; border-radius: 50%; }
         .pen-box-l { left: 0; top: 20%; width: 40px; height: 60%; border-left: none; }
         .pen-box-r { right: 0; top: 20%; width: 40px; height: 60%; border-right: none; }
         
         #pin { 
-            position: absolute; width: 24px; height: 24px; 
+            position: absolute; width: 22px; height: 22px; 
             background: #ef4444; border: 3px solid white; border-radius: 50%; 
             transform: translate(-50%, -50%); display: none; z-index: 50; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4); pointer-events: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); pointer-events: none;
         }
+
+        /* DYNAMIC LIGHT THEME OVERRIDES FOR SECOND SCREEN */
+        #matchScreen.light-theme { background-color: #f3f4f6 !important; color: #1f2937 !important; }
+        #matchScreen.light-theme header { background-color: #ffffff !important; color: #1f2937 !important; border-color: #e5e7eb !important; }
+        #matchScreen.light-theme header button:not(#startTimerBtn) { background-color: #f3f4f6 !important; border-color: #d1d5db !important; color: #4b5563 !important; }
+        #matchScreen.light-theme h2 { color: #4b5563 !important; }
+        
+        #matchScreen.light-theme #who-group button, 
+        #matchScreen.light-theme #what-group button:not(.bg-orange-950\/40):not(.bg-yellow-950\/40):not(.bg-red-950\/40):not(.bg-green-950\/40):not(.bg-amber-950\/40) { 
+            background-color: #ffffff !important; border-color: #d1d5db !important; color: #1f2937 !important; 
+        }
+        
+        #matchScreen.light-theme #what-group button.bg-orange-950\/40 { background-color: #fff7ed !important; border-color: #fed7aa !important; color: #c2410c !important; }
+        #matchScreen.light-theme #what-group button.bg-yellow-950\/40 { background-color: #fefce8 !important; border-color: #fef08a !important; color: #854d0e !important; }
+        #matchScreen.light-theme #what-group button.bg-red-950\/40 { background-color: #fef2f2 !important; border-color: #fecaca !important; color: #dc2626 !important; }
+        #matchScreen.light-theme #what-group button.bg-green-950\/40 { background-color: #f0fdf4 !important; border-color: #bbf7d0 !important; color: #16a34a !important; }
+        #matchScreen.light-theme #what-group button.bg-amber-950\/40 { background-color: #fffbeb !important; border-color: #fca5a5 !important; color: #991b1b !important; }
+        
+        #matchScreen.light-theme .selected { background-color: #2563eb !important; color: #ffffff !important; border-color: #1d4ed8 !important; }
+        #matchScreen.light-theme .cmi-selected { background-color: #dc2626 !important; color: #ffffff !important; border-color: #991b1b !important; box-shadow: 0 0 12px rgba(220, 38, 38, 0.4) !important; }
+        #matchScreen.light-theme .diff-selected { background-color: #334155 !important; color: #ffffff !important; border-color: #1e293b !important; }
+
+        #matchScreen.light-theme #foul-team-container,
+        #matchScreen.light-theme #difficulty-options { background-color: #e5e7eb !important; border-color: #d1d5db !important; }
+        #matchScreen.light-theme #foul-team-container p,
+        #matchScreen.light-theme #difficulty-options p { color: #4b5563 !important; }
+        #matchScreen.light-theme #difficulty-group button { background-color: #ffffff !important; border-color: #cbd5e1 !important; color: #334155 !important; }
+        
+        #matchScreen.light-theme #rating-group button:not(.selected):not(.cmi-selected) { background-color: #ffffff !important; border-color: #d1d5db !important; }
+        #matchScreen.light-theme #rating-group button:first-child:not(.selected) { color: #16a34a !important; }
+        #matchScreen.light-theme #rating-group button:nth-child(2):not(.selected) { color: #ea580c !important; }
+        #matchScreen.light-theme #rating-group button:nth-child(3):not(.selected) { color: #dc2626 !important; }
+
+        #matchScreen.light-theme #noFlagBtn { background-color: #e0e7ff !important; border-color: #a5b4fc !important; color: #4338ca !important; }
+        #matchScreen.light-theme #noFlagBtn.selected { background-color: #4f46e5 !important; border-color: #3730a3 !important; color: #ffffff !important; }
+
+        #matchScreen.light-theme #quickNote { background-color: #ffffff !important; border-color: #d1d5db !important; color: #1f2937 !important; }
+        
+        #matchScreen.light-theme .bg-slate-950.p-2 { background-color: #e5e7eb !important; border-color: #cbd5e1 !important; }
+        #matchScreen.light-theme .bg-slate-950.p-2 span { color: #4b5563 !important; }
+        #matchScreen.light-theme #logList { background-color: #f9fafb !important; border-color: #e5e7eb !important; }
+        
+        #matchScreen.light-theme .log-entry { background-color: #ffffff !important; color: #1f2937 !important; border-color: #cbd5e1 !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; }
+        #matchScreen.light-theme .log-entry .text-slate-200 { color: #111827 !important; }
+        #matchScreen.light-theme .log-entry .text-slate-300 { color: #374151 !important; }
+        #matchScreen.light-theme .log-entry .text-blue-400 { color: #2563eb !important; }
+        #matchScreen.light-theme .log-entry .text-slate-500 { color: #6b7280 !important; }
+        #matchScreen.light-theme .log-entry .text-red-400 { color: #dc2626 !important; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans flex flex-col h-screen overflow-hidden text-sm">
+<body class="bg-slate-950 text-slate-100 font-sans flex flex-col h-screen overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800">
 
-    <header class="bg-slate-900 text-white p-3 pt-8 flex justify-between items-center shadow-md">
-        <div id="timerDisplay" class="text-3xl font-mono font-bold text-green-400">00:00</div>
-        <div class="flex gap-2">
-            <button id="startTimerBtn" onclick="toggleTimer()" class="bg-green-600 px-4 py-2 rounded-lg font-bold uppercase text-xs">Start</button>
-            <button onclick="resetTimer()" class="bg-gray-700 px-3 py-2 rounded-lg text-[10px] font-bold uppercase">Reset</button>
+    <div id="setupScreen" class="flex-1 overflow-y-auto p-4 flex flex-col gap-5 bg-slate-900 text-white">
+        <div class="text-center py-2">
+            <h1 class="text-2xl font-black text-green-400 tracking-tight uppercase">Ref Coach Pro</h1>
+            <p class="text-xs text-slate-400">Pre-Match Configurations</p>
         </div>
-    </header>
 
-    <main class="flex-1 overflow-y-auto p-3 flex flex-col gap-4">
-        <section>
-            <h2 class="text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">1. Official</h2>
-            <div class="grid grid-cols-4 gap-1.5" id="who-group">
-                <button onclick="selectSingle('who', 'Ref', this)" class="bg-white border border-gray-300 py-3 rounded-lg font-bold">REF</button>
-                <button onclick="selectSingle('who', 'AR1', this)" class="bg-white border border-gray-300 py-3 rounded-lg font-bold">AR1</button>
-                <button onclick="selectSingle('who', 'AR2', this)" class="bg-white border border-gray-300 py-3 rounded-lg font-bold">AR2</button>
-                <button onclick="selectSingle('who', '4th', this)" class="bg-white border border-gray-300 py-3 rounded-lg font-bold">4th</button>
+        <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-3">
+            <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-1">1. Match Officials</h2>
+            <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Center Referee (REF)</label>
+                <input type="text" id="setupRef" value="Ref" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
             </div>
-        </section>
-
-        <section>
-            <div class="flex justify-between items-center mb-1">
-                <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">2. Position</h2>
-                <button onclick="toggleFieldDisplay()" class="text-[10px] bg-blue-100 px-3 py-1 rounded-full font-bold text-blue-700">MAP FIELD</button>
-            </div>
-            <div id="fieldSection" class="hidden">
-                <div class="field-canvas" id="soccerField" onclick="dropPin(event)">
-                    <div id="pin"></div>
-                    <div class="field-line half-line"></div>
-                    <div class="field-line center-circle"></div>
-                    <div class="field-line pen-box-l"></div>
-                    <div class="field-line pen-box-r"></div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Assistant Ref 1 (AR1)</label>
+                    <input type="text" id="setupAR1" value="AR1" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Assistant Ref 2 (AR2)</label>
+                    <input type="text" id="setupAR2" value="AR2" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
                 </div>
             </div>
-        </section>
-
-        <section>
-            <div class="flex justify-between items-center mb-1">
-                <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">3. Incident Type</h2>
-                <button onclick="clearMulti('what')" class="text-[10px] text-blue-600 font-bold">CLEAR</button>
+            <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">4th Official (Optional)</label>
+                <input type="text" id="setup4th" value="4th" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
             </div>
-            <div class="grid grid-cols-3 gap-1.5" id="what-group">
-                <button onclick="toggleMulti('what', 'Foul', this)" class="bg-white border border-gray-300 py-3 rounded-lg font-bold">Foul</button>
-                <button onclick="handleOffsideToggle(this)" class="bg-white border border-gray-300 py-3 rounded-lg font-bold">Offside</button>
-                <button onclick="toggleMulti('what', 'Advantage', this)" class="bg-white border border-gray-300 py-3 rounded-lg font-bold">Adv.</button>
-                <button onclick="handleCMIToggle('Penalty', this)" class="bg-orange-50 border border-orange-300 py-3 rounded-lg font-bold text-orange-800">Penalty</button>
-                <button onclick="handleCMIToggle('Yellow', this)" class="bg-yellow-50 border border-yellow-400 py-3 rounded-lg font-bold text-yellow-700">Yellow</button>
-                <button onclick="handleCMIToggle('Red', this)" class="bg-red-50 border border-red-400 py-3 rounded-lg font-bold text-red-700">Red Card</button>
-                <button onclick="handleGoalToggle(this)" class="bg-green-50 border border-green-400 py-3 rounded-lg font-bold text-green-700">Goal</button>
-                <button onclick="handleCMIToggle('2nd Yellow', this)" class="bg-yellow-100 border-2 border-red-400 py-3 rounded-lg font-bold text-red-800 text-[10px]">2nd Yellow</button>
-                <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-white border border-gray-300 py-3 rounded-lg font-bold text-[10px]">Mistaken ID</button>
-            </div>
+        </div>
 
-            <div id="conditional-options" class="mt-2 hidden">
-                <button id="noFlagBtn" onclick="toggleMulti('what', 'No Flag', this)" class="w-full bg-indigo-100 border-2 border-indigo-400 py-3 rounded-lg font-black text-indigo-700">
-                    OFFSIDE: No Flag / Stayed Down
-                </button>
-            </div>
-
-            <div id="difficulty-options" class="mt-2 hidden bg-slate-200 p-2 rounded-lg">
-                <p class="text-[9px] font-bold text-slate-500 uppercase mb-1">Difficulty</p>
-                <div class="flex gap-1.5" id="difficulty-group">
-                    <button onclick="selectDifficulty('RTN', this)" class="flex-1 bg-white border border-gray-400 py-2 rounded font-bold text-xs">ROUTINE</button>
-                    <button onclick="selectDifficulty('DIF', this)" class="flex-1 bg-white border border-gray-400 py-2 rounded font-bold text-xs">DIFFICULT</button>
-                    <button onclick="selectDifficulty('IMP', this)" class="flex-1 bg-white border border-gray-400 py-2 rounded font-bold text-xs">IMP</button>
+        <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-4">
+            <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider">2. Team Configuration</h2>
+            
+            <div class="flex items-end gap-3">
+                <div class="flex-1">
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Home Team / Team A Name</label>
+                    <input type="text" id="setupTeamAName" value="Home" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1 text-center">Jersey</label>
+                    <input type="color" id="setupTeamAColor" value="#3b82f6" class="w-12 h-10 bg-transparent border-0 cursor-pointer block">
                 </div>
             </div>
-        </section>
 
-        <section>
-            <div class="flex gap-1.5" id="rating-group">
-                <button onclick="selectSingle('rating', 'Correct', this)" class="flex-1 bg-white border border-gray-300 py-4 rounded-xl font-black text-green-600">CORRECT</button>
-                <button onclick="selectSingle('rating', 'Incorrect', this)" class="flex-1 bg-white border border-gray-300 py-4 rounded-xl font-black text-orange-500">INCORRECT</button>
-                <button id="cmiToggle" onclick="toggleCMI()" class="flex-1 bg-white border border-red-200 py-4 rounded-xl font-black text-red-600">🚨 CMI</button>
+            <div class="flex items-end gap-3">
+                <div class="flex-1">
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Away Team / Team B Name</label>
+                    <input type="text" id="setupTeamBName" value="Away" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1 text-center">Jersey</label>
+                    <input type="color" id="setupTeamBColor" value="#ef4444" class="w-12 h-10 bg-transparent border-0 cursor-pointer block">
+                </div>
             </div>
-        </section>
+        </div>
 
-        <section class="pb-6">
-            <div class="flex gap-2">
-                <input type="text" id="quickNote" placeholder="Notes..." class="flex-1 p-4 rounded-xl border border-gray-300">
-                <button onclick="logEvent()" class="bg-blue-600 text-white font-black px-8 rounded-xl shadow-xl uppercase">Save</button>
+        <button onclick="commitSetup()" class="w-full bg-green-500 active:bg-green-600 text-slate-950 font-black py-4 rounded-xl text-center uppercase tracking-wide text-sm shadow-lg mt-auto">
+            Proceed to Match Dashboard &rarr;
+        </button>
+    </div>
+
+
+    <div id="matchScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-900">
+        <header class="bg-slate-950 text-white p-3 flex justify-between items-center shadow-md gap-1 border-b border-slate-800">
+            <button onclick="goBackToSetup()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] font-black uppercase px-2 py-2 rounded-lg tracking-wide">&larr; Setup</button>
+            <div id="timerDisplay" onclick="adjustTimer()" class="text-2xl font-mono font-bold text-green-400 cursor-pointer select-none hover:text-green-300 transition-colors" title="Tap to adjust time">00:00</div>
+            <div class="flex gap-1 items-center">
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-slate-800 border border-slate-700 px-2.5 py-1.5 rounded-lg text-xs" title="Toggle Light/Dark Theme">☀️</button>
+                <button id="startTimerBtn" onclick="toggleTimer()" class="bg-green-600 px-2.5 py-1.5 rounded-lg font-bold uppercase text-[10px]">Start</button>
+                <button onclick="resetTimer()" class="bg-slate-700 px-2 py-1.5 rounded-lg text-[10px] font-bold uppercase">Reset</button>
             </div>
-        </section>
-    </main>
+        </header>
 
-    <div class="h-40 bg-slate-100 p-3 overflow-y-auto border-t border-gray-300 font-mono text-[11px]" id="logList"></div>
+        <main class="overflow-y-auto p-3 flex flex-col gap-4">
+            <section>
+                <h2 class="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">1. Official</h2>
+                <div class="grid grid-cols-4 gap-1.5" id="who-group">
+                    <button id="btnRef" onclick="selectSingle('who', 'Ref', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">REF</span>
+                        <span id="lblRefName" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
+                    </button>
+                    <button id="btnAR1" onclick="selectSingle('who', 'AR1', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">AR1</span>
+                        <span id="lblAR1Name" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
+                    </button>
+                    <button id="btnAR2" onclick="selectSingle('who', 'AR2', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">AR2</span>
+                        <span id="lblAR2Name" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
+                    </button>
+                    <button id="btn4th" onclick="selectSingle('who', '4th', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">4th</span>
+                        <span id="lbl4thName" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
+                    </button>
+                </div>
+            </section>
+
+            <section>
+                <div class="flex justify-between items-center mb-1">
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">2. Position</h2>
+                    <button onclick="toggleFieldDisplay()" class="text-[10px] bg-blue-950 border border-blue-800 px-3 py-1 rounded-full font-bold text-blue-400">MAP FIELD</button>
+                </div>
+                <div id="fieldSection" class="hidden">
+                    <div class="field-canvas" id="soccerField" onclick="dropPin(event)">
+                        <div id="pin"></div>
+                        <div class="field-line half-line"></div>
+                        <div class="field-line center-circle"></div>
+                        <div class="field-line pen-box-l"></div>
+                        <div class="field-line pen-box-r"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="flex justify-between items-center mb-1">
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">3. Incident Type</h2>
+                    <button onclick="clearMulti('what')" class="text-[10px] text-blue-400 font-bold uppercase tracking-wide">Clear</button>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5" id="what-group">
+                    <button onclick="handleFoulToggle(this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-slate-200">Foul</button>
+                    <button onclick="handleOffsideToggle(this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-slate-200">Offside</button>
+                    <button onclick="toggleMulti('what', 'Advantage', this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-slate-200">Adv.</button>
+                    <button onclick="handleCMIToggle('Penalty', this)" class="bg-orange-950/40 border border-orange-800 py-3 rounded-lg font-bold text-orange-400">Penalty</button>
+                    <button onclick="handleCMIToggle('Yellow', this)" class="bg-yellow-950/40 border border-yellow-700 py-3 rounded-lg font-bold text-yellow-400">Yellow</button>
+                    <button onclick="handleCMIToggle('Red', this)" class="bg-red-950/40 border border-red-800 py-3 rounded-lg font-bold text-red-400">Red Card</button>
+                    <button onclick="handleGoalToggle(this)" class="bg-green-950/40 border border-green-800 py-3 rounded-lg font-bold text-green-400">Goal</button>
+                    <button onclick="handleCMIToggle('2nd Yellow', this)" class="bg-amber-950/40 border-2 border-red-800 py-3 rounded-lg font-bold text-red-400 text-[10px]">2nd Yellow</button>
+                    <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-[10px] text-slate-200">Mistaken ID</button>
+                </div>
+
+                <div id="foul-team-container" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Team Committing Foul</p>
+                    <div class="flex gap-2" id="foul-team-group">
+                        <button id="foulTeamABtn" onclick="selectFoulTeam('TeamA', this)" class="flex-1 py-3 rounded-lg font-black text-xs shadow-sm uppercase border-2 border-transparent"></button>
+                        <button id="foulTeamBBtn" onclick="selectFoulTeam('TeamB', this)" class="flex-1 py-3 rounded-lg font-black text-xs shadow-sm uppercase border-2 border-transparent"></button>
+                    </div>
+                </div>
+
+                <div id="conditional-options" class="mt-2 hidden">
+                    <button id="noFlagBtn" onclick="toggleMulti('what', 'No Flag', this)" class="w-full bg-indigo-950/60 border-2 border-indigo-800 py-3 rounded-lg font-black text-indigo-300">
+                        OFFSIDE: No Flag / Stayed Down
+                    </button>
+                </div>
+
+                <div id="difficulty-options" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Difficulty</p>
+                    <div class="flex gap-1.5" id="difficulty-group">
+                        <button onclick="selectDifficulty('RTN', this)" class="flex-1 bg-slate-700 border border-slate-600 py-2 rounded font-bold text-xs text-slate-200">ROUTINE</button>
+                        <button onclick="selectDifficulty('DIF', this)" class="flex-1 bg-slate-700 border border-slate-600 py-2 rounded font-bold text-xs text-slate-200">DIFFICULT</button>
+                        <button onclick="selectDifficulty('IMP', this)" class="flex-1 bg-slate-700 border border-slate-600 py-2 rounded font-bold text-xs text-slate-200">IMPOSSIBLE</button>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="flex gap-1.5" id="rating-group">
+                    <button onclick="selectSingle('rating', 'Correct', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-green-400">CORRECT</button>
+                    <button onclick="selectSingle('rating', 'Incorrect', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-orange-400">INCORRECT</button>
+                    <button id="cmiToggle" onclick="toggleCMI()" class="flex-1 bg-slate-800 border border-red-900/60 py-4 rounded-xl font-black text-red-400">🚨 CMI</button>
+                </div>
+            </section>
+
+            <section>
+                <div class="flex gap-2">
+                    <input type="text" id="quickNote" placeholder="Notes..." class="flex-1 p-4 rounded-xl border border-slate-700 bg-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+                    <button onclick="logEvent()" class="bg-blue-600 text-white font-black px-8 rounded-xl shadow-xl uppercase tracking-wider text-xs">Save</button>
+                </div>
+            </section>
+        </main>
+
+        <div class="bg-slate-950 p-2 px-3 flex justify-between items-center border-t border-slate-800 shadow-inner">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Match Log History</span>
+            <button onclick="exportToCSV()" class="bg-indigo-600 active:bg-indigo-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-md uppercase tracking-wide shadow-md">Export Excel (CSV)</button>
+        </div>
+        <div class="flex-1 min-h-[140px] bg-slate-950 p-3 overflow-y-auto font-mono text-[11px] border-t border-slate-900" id="logList"></div>
+    </div>
 
     <script>
-        // SERVICE WORKER FOR OFFLINE USE
         if ('serviceWorker' in navigator) {
             const swCode = `self.addEventListener('fetch', function(e) { e.respondWith(fetch(e.request)); });`;
             const blob = new Blob([swCode], {type: 'text/javascript'});
-            navigator.serviceWorker.register(URL.createObjectURL(blob));
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log("Local PWA Warning skipped."));
         }
 
-        let currentSelection = { who: null, what: [], rating: null, isCMI: false, coords: null, difficulty: null };
+        // Configuration State Store
+        let config = {
+            refName: "Ref", ar1Name: "AR1", ar2Name: "AR2", fourthName: "4th",
+            teamAName: "Home", teamAColor: "#3b82f6",
+            teamBName: "Away", teamBColor: "#ef4444"
+        };
+
+        let currentSelection = { who: null, what: [], foulTeam: null, rating: null, isCMI: false, coords: null, difficulty: null };
         let timerInterval, seconds = 0, isRunning = false;
+        let structuredMatchLogs = [];
+
+        function toggleTheme() {
+            const matchScreen = document.getElementById("matchScreen");
+            const themeBtn = document.getElementById("themeToggleBtn");
+            matchScreen.classList.toggle("light-theme");
+            themeBtn.textContent = matchScreen.classList.contains("light-theme") ? "🌙" : "☀️";
+        }
+
+        function getContrastColor(hexColor) {
+            const hex = hexColor.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            return (yiq >= 128) ? '#000000' : '#ffffff';
+        }
+
+        function commitSetup() {
+            config.refName = document.getElementById("setupRef").value.trim() || "Ref";
+            config.ar1Name = document.getElementById("setupAR1").value.trim() || "AR1";
+            config.ar2Name = document.getElementById("setupAR2").value.trim() || "AR2";
+            config.fourthName = document.getElementById("setup4th").value.trim() || "4th";
+            config.teamAName = document.getElementById("setupTeamAName").value.trim() || "Home";
+            config.teamAColor = document.getElementById("setupTeamAColor").value;
+            config.teamBName = document.getElementById("setupTeamBName").value.trim() || "Away";
+            config.teamBColor = document.getElementById("setupTeamBColor").value;
+
+            if(document.getElementById("lblRefName")) document.getElementById("lblRefName").textContent = config.refName;
+            if(document.getElementById("lblAR1Name")) document.getElementById("lblAR1Name").textContent = config.ar1Name;
+            if(document.getElementById("lblAR2Name")) document.getElementById("lblAR2Name").textContent = config.ar2Name;
+            if(document.getElementById("lbl4thName")) document.getElementById("lbl4thName").textContent = config.fourthName;
+
+            const btnFoulA = document.getElementById("foulTeamABtn");
+            if(btnFoulA) {
+                btnFoulA.textContent = config.teamAName;
+                btnFoulA.style.backgroundColor = config.teamAColor;
+                btnFoulA.style.borderColor = "transparent";
+                btnFoulA.style.color = getContrastColor(config.teamAColor);
+            }
+
+            const btnFoulB = document.getElementById("foulTeamBBtn");
+            if(btnFoulB) {
+                btnFoulB.textContent = config.teamBName;
+                btnFoulB.style.backgroundColor = config.teamBColor;
+                btnFoulB.style.borderColor = "transparent";
+                btnFoulB.style.color = getContrastColor(config.teamBColor);
+            }
+
+            document.getElementById("setupScreen").classList.add("hidden");
+            document.getElementById("matchScreen").classList.remove("hidden");
+        }
+
+        function goBackToSetup() {
+            document.getElementById("matchScreen").classList.add("hidden");
+            document.getElementById("setupScreen").classList.remove("hidden");
+        }
 
         function toggleFieldDisplay() { document.getElementById('fieldSection').classList.toggle('hidden'); }
         
@@ -142,6 +340,22 @@
             const y = Math.round((e.clientY - rect.top) / rect.height * 100);
             pin.style.left = x + '%'; pin.style.top = y + '%'; pin.style.display = 'block';
             currentSelection.coords = `[${x}%, ${y}%]`;
+        }
+
+        function handleFoulToggle(element) {
+            toggleMulti('what', 'Foul', element);
+            const clearFoulPanel = !currentSelection.what.includes('Foul');
+            document.getElementById('foul-team-container').classList.toggle('hidden', clearFoulPanel);
+            if (clearFoulPanel) {
+                currentSelection.foulTeam = null;
+                document.querySelectorAll('#foul-team-group button').forEach(b => b.style.borderColor = 'transparent');
+            }
+        }
+
+        function selectFoulTeam(teamKey, element) {
+            document.querySelectorAll('#foul-team-group button').forEach(b => b.style.borderColor = 'transparent');
+            element.style.borderColor = document.getElementById("matchScreen").classList.contains("light-theme") ? '#000000' : '#ffffff'; 
+            currentSelection.foulTeam = (teamKey === 'TeamA') ? config.teamAName : config.teamBName;
         }
 
         function handleOffsideToggle(element) {
@@ -173,19 +387,51 @@
             currentSelection.difficulty = val;
         }
 
+        function clearAllLogs() {
+            document.getElementById("logList").innerHTML = "";
+            structuredMatchLogs = [];
+        }
+
+        function updateTimerDisplay() {
+            const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const secs = String(seconds % 60).padStart(2, '0');
+            document.getElementById("timerDisplay").textContent = `${mins}:${secs}`;
+        }
+
         function toggleTimer() {
             const btn = document.getElementById("startTimerBtn");
-            if (isRunning) { clearInterval(timerInterval); btn.textContent = "Resume"; }
-            else {
+            if (isRunning) { 
+                clearInterval(timerInterval); 
+                btn.textContent = "Resume"; 
+                isRunning = false;
+            } else {
                 timerInterval = setInterval(() => {
                     seconds++;
-                    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
-                    const secs = String(seconds % 60).padStart(2, '0');
-                    document.getElementById("timerDisplay").textContent = `${mins}:${secs}`;
+                    updateTimerDisplay();
                 }, 1000);
                 btn.textContent = "Pause";
+                isRunning = true;
             }
-            isRunning = !isRunning;
+        }
+
+        function adjustTimer() {
+            let wasRunning = isRunning;
+            if (isRunning) { toggleTimer(); }
+            let currentTimeStr = document.getElementById("timerDisplay").textContent;
+            let newTime = prompt("Set match time (MM:SS or raw minutes):", currentTimeStr);
+            
+            if (newTime !== null && newTime.trim() !== "") {
+                let parts = newTime.split(":");
+                let newSeconds = 0;
+                if (parts.length === 2) {
+                    newSeconds = (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0);
+                } else if (parts.length === 1) {
+                    newSeconds = (parseInt(parts[0], 10) || 0) * 60;
+                }
+                seconds = newSeconds;
+                updateTimerDisplay();
+            }
+            if (wasRunning) { toggleTimer(); }
         }
 
         function selectSingle(cat, val, el) {
@@ -208,6 +454,8 @@
             currentSelection[cat] = [];
             document.querySelectorAll(`#${cat}-group button`).forEach(b => b.classList.remove('selected', 'cmi-selected'));
             document.getElementById('conditional-options').classList.add('hidden');
+            document.getElementById('foul-team-container').classList.add('hidden');
+            currentSelection.foulTeam = null;
             checkDifficultyVisibility();
         }
 
@@ -219,41 +467,132 @@
         function logEvent() {
             const list = document.getElementById("logList");
             const entry = document.createElement("div");
-            entry.className = `p-2 mb-1 border-l-4 bg-white shadow-sm ${currentSelection.isCMI ? 'border-red-500' : 'border-blue-500'}`;
+            entry.className = `log-entry p-2 mb-1 border-l-4 bg-slate-800 text-slate-100 shadow-sm ${currentSelection.isCMI ? 'border-red-500' : 'border-blue-500'}`;
             
             let displayItems = [];
             let source = [...currentSelection.what];
-            if (source.includes('Foul')) { displayItems.push('Foul'); source = source.filter(i => i !== 'Foul'); }
+            
+            if (source.includes('Foul')) { 
+                let foulLabel = 'Foul';
+                if (currentSelection.foulTeam) { foulLabel += ` (${currentSelection.foulTeam})`; }
+                displayItems.push(foulLabel); 
+                source = source.filter(i => i !== 'Foul'); 
+            }
             if (source.includes('Offside')) { 
                 displayItems.push(source.includes('No Flag') ? 'Offside (Flag Down)' : 'Offside'); 
                 source = source.filter(i => i !== 'Offside' && i !== 'No Flag');
             }
             displayItems = displayItems.concat(source);
 
+            const timestamp = document.getElementById("timerDisplay").textContent;
+            
+            let mappedOfficialRole = 'REF';
+            let assignedName = config.refName;
+            if (currentSelection.who === 'AR1') { mappedOfficialRole = 'AR1'; assignedName = config.ar1Name; }
+            if (currentSelection.who === 'AR2') { mappedOfficialRole = 'AR2'; assignedName = config.ar2Name; }
+            if (currentSelection.who === '4th') { mappedOfficialRole = '4th'; assignedName = config.fourthName; }
+
+            const locationCoords = currentSelection.coords || '';
+            const compoundIncidents = displayItems.join(" + ");
+            const metricDiff = currentSelection.difficulty || 'NA';
+            const metricRating = currentSelection.rating || 'UNRATED';
+            const noteContent = document.getElementById('quickNote').value || '';
+
+            structuredMatchLogs.push({
+                time: timestamp,
+                officialRole: mappedOfficialRole,
+                officialName: assignedName,
+                coords: locationCoords,
+                incidents: compoundIncidents,
+                teamInvolved: currentSelection.foulTeam || 'N/A',
+                difficulty: metricDiff,
+                evaluation: metricRating,
+                cmi: currentSelection.isCMI ? 'YES' : 'NO',
+                notes: noteContent
+            });
+
             entry.innerHTML = `
-                <div class="flex justify-between font-bold">
-                    <span>${document.getElementById("timerDisplay").textContent} | ${currentSelection.who || 'REF'}</span>
-                    <span class="text-gray-400">${currentSelection.coords || ''}</span>
+                <div class="flex justify-between font-bold text-slate-200">
+                    <span>${timestamp} | ${mappedOfficialRole} (${assignedName})</span>
+                    <span class="text-slate-500 font-normal">${locationCoords}</span>
                 </div>
-                <div>
-                    ${displayItems.join(" + ")} [${currentSelection.difficulty || 'NA'}] — ${currentSelection.rating || ''} 
-                    ${currentSelection.isCMI ? '<b class="text-red-600">[CMI]</b>' : ''}
+                <div class="text-slate-300 mt-0.5">
+                    ${compoundIncidents} [${metricDiff}] — <span class="italic font-bold text-blue-400">${metricRating}</span> 
+                    ${currentSelection.isCMI ? '<b class="text-red-400 ml-1">[CMI]</b>' : ''}
                 </div>
+                ${noteContent ? `<div class="text-slate-400 italic mt-0.5 text-[10px]">"${noteContent}"</div>` : ''}
             `;
             list.insertBefore(entry, list.firstChild);
             resetUI();
         }
 
+        function exportToCSV() {
+            if (structuredMatchLogs.length === 0) {
+                alert("There are no logging events recorded yet to export.");
+                return;
+            }
+            
+            const forceText = (str) => {
+                if (!str) return '""';
+                let escaped = String(str).replace(/"/g, '""');
+                return `"=""${escaped}"""`;
+            };
+
+            const csvHeaders = "Match Time,Official Position,Official Name,Field Coordinates,Incident Details,Infracting Team,Difficulty Tier,Evaluation,CMI Flag,Notes\n";
+            
+            const csvRows = structuredMatchLogs.map(item => {
+                return [
+                    forceText(item.time),
+                    forceText(item.officialRole),
+                    forceText(item.officialName),
+                    forceText(item.coords),
+                    forceText(item.incidents),
+                    forceText(item.teamInvolved),
+                    forceText(item.difficulty),
+                    forceText(item.evaluation),
+                    forceText(item.cmi),
+                    forceText(item.notes)
+                ].join(",");
+            }).join("\n");
+
+            const finalCsvString = csvHeaders + csvRows;
+            const blob = new Blob([finalCsvString], { type: 'text/csv;charset=utf-8;' });
+            const blobUrl = URL.createObjectURL(blob);
+            const downloadLink = document.createElement("a");
+            downloadLink.setAttribute("href", blobUrl);
+            downloadLink.setAttribute("download", `Ref_Coach_Detailed_Report_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(blobUrl);
+        }
+
         function resetUI() {
-            currentSelection = { who: null, what: [], rating: null, isCMI: false, coords: null, difficulty: null };
+            currentSelection = { who: null, what: [], foulTeam: null, rating: null, isCMI: false, coords: null, difficulty: null };
             document.querySelectorAll('.selected, .cmi-selected, .diff-selected').forEach(el => el.classList.remove('selected', 'cmi-selected', 'diff-selected'));
+            document.querySelectorAll('#foul-team-group button').forEach(b => b.style.borderColor = 'transparent');
             document.getElementById('conditional-options').classList.add('hidden');
+            document.getElementById('foul-team-container').classList.add('hidden');
             document.getElementById('difficulty-options').classList.add('hidden');
             document.getElementById('pin').style.display = 'none';
             document.getElementById('quickNote').value = "";
         }
 
-        function resetTimer() { if(confirm("Reset?")) { clearInterval(timerInterval); seconds = 0; isRunning = false; document.getElementById("timerDisplay").textContent = "00:00"; } }
+        function resetTimer() { 
+            if(confirm("Wipe everything and return to Setup Screen?")) { 
+                clearInterval(timerInterval); 
+                seconds = 0; 
+                isRunning = false; 
+                updateTimerDisplay(); 
+                document.getElementById("startTimerBtn").textContent = "Start";
+                clearAllLogs();
+                resetUI();
+                document.getElementById("matchScreen").classList.remove("light-theme");
+                document.getElementById("themeToggleBtn").textContent = "☀️";
+                document.getElementById("matchScreen").classList.add("hidden");
+                document.getElementById("setupScreen").classList.remove("hidden");
+            } 
+        }
     </script>
 </body>
 </html>
