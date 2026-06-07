@@ -17,6 +17,29 @@
         .diff-selected { background-color: #475569 !important; color: white !important; border-color: #94a3b8 !important; }
         .cmi-selected { background-color: #ef4444 !important; color: white !important; border-color: #dc2626 !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
 
+        /* EXPANDABLE LOG HISTORY ANIMATION & OVERLAY */
+        #logHistoryContainer { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        #logHistoryContainer.fullscreen-logs {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            height: 100% !important; max-height: 100% !important;
+            z-index: 50; background-color: #020617 !important;
+        }
+
+        /* SWIPE CONTROL ARCHITECTURE */
+        .log-row-wrapper { position: relative; overflow: hidden; margin-bottom: 4px; border-radius: 8px; }
+        .log-entry { 
+            position: relative; z-index: 10; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            background-color: #1e293b; border-left-width: 4px;
+        }
+        .swipe-action-container {
+            position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            display: flex; justify-content: space-between; align-items: center; z-index: 1;
+        }
+        .swipe-action-btn {
+            height: 100%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 11px; text-transform: uppercase; width: 75px; color: white;
+        }
+
         /* DYNAMIC LIGHT THEME OVERRIDES FOR SECOND SCREEN */
         #matchScreen.light-theme { background-color: #f3f4f6 !important; color: #1f2937 !important; }
         #matchScreen.light-theme header { background-color: #ffffff !important; color: #1f2937 !important; border-color: #e5e7eb !important; }
@@ -64,6 +87,7 @@
         #matchScreen.light-theme .log-entry .text-blue-400 { color: #2563eb !important; }
         #matchScreen.light-theme .log-entry .text-slate-500 { color: #6b7280 !important; }
         #matchScreen.light-theme .log-entry .text-red-400 { color: #dc2626 !important; }
+        #matchScreen.light-theme #logHistoryContainer.fullscreen-logs { background-color: #f3f4f6 !important; }
 
         /* FOUL COUNTER THEME ADJUSTMENTS */
         #matchScreen.light-theme #foul-counter-dashboard { background-color: #e5e7eb !important; border-color: #d1d5db !important; color: #1f2937 !important; }
@@ -74,7 +98,7 @@
         #matchScreen.light-theme .score-digit { background-color: #ffffff !important; color: #111827 !important; border-color: #cbd5e1 !important; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans flex flex-col h-screen overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800">
+<body class="bg-slate-950 text-slate-100 font-sans flex flex-col h-screen overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800 relative">
 
     <div id="setupScreen" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-slate-900 text-white">
         <div class="text-center py-1">
@@ -165,7 +189,7 @@
         </header>
 
         <main class="overflow-y-auto p-3 flex flex-col gap-4">
-            <section>
+            <section id="officialSection">
                 <h2 class="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">1. Official</h2>
                 <div class="grid grid-cols-4 gap-1.5" id="who-group">
                     <button id="btnRef" onclick="selectSingleWho('who', 'Ref', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
@@ -215,7 +239,7 @@
                     <button onclick="handleCMIToggle('Penalty', this)" class="bg-orange-950/40 border border-orange-800 py-3 rounded-lg font-bold text-orange-400">Penalty</button>
                     <button onclick="handleCMIToggle('Yellow', this)" class="bg-yellow-950/40 border border-yellow-700 py-3 rounded-lg font-bold text-yellow-400">Yellow</button>
                     <button onclick="handleCMIToggle('Red', this)" class="bg-red-950/40 border border-red-800 py-3 rounded-lg font-bold text-red-400">Red Card</button>
-                    <button onclick="handleGoalToggle(this)" class="bg-green-950/40 border border-green-800 py-3 rounded-lg font-bold text-green-400">Goal</button>
+                    <button onclick="handleGoalToggle(this)" class="bg-green-950/40 border border-green-800 py-3 rounded-lg font-black text-green-400 text-base">⚽ Goal</button>
                     <button onclick="handleCMIToggle('2nd Yellow', this)" class="bg-amber-950/40 border-2 border-red-800 py-3 rounded-lg font-bold text-red-400 text-[10px]">2nd Yellow</button>
                     <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-[10px] text-slate-200">Mistaken ID</button>
                 </div>
@@ -244,7 +268,7 @@
                 </div>
             </section>
 
-            <section>
+            <section id="evaluationSection">
                 <div class="flex gap-1.5" id="rating-group">
                     <button onclick="selectSingleRating('rating', 'Correct', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-green-400">CORRECT</button>
                     <button onclick="selectSingleRating('rating', 'Incorrect', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-orange-400">INCORRECT</button>
@@ -260,11 +284,15 @@
             </section>
         </main>
 
-        <div class="bg-slate-950 p-2 px-3 flex justify-between items-center border-t border-slate-800 shadow-inner">
-            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Match Log History</span>
-            <button onclick="exportToCSV()" class="bg-indigo-600 active:bg-indigo-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-md uppercase tracking-wide shadow-md">Export Excel (CSV)</button>
+        <div id="logHistoryContainer" class="flex flex-col bg-slate-950 border-t border-slate-900 min-h-[160px] max-h-[250px]">
+            <div onclick="toggleFullscreenLogs()" class="bg-slate-950 p-2.5 px-3 flex justify-between items-center border-b border-slate-900 shadow-inner cursor-pointer select-none active:bg-slate-900">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                    🗖 Match Log History <span class="text-[9px] font-normal text-blue-400 lowercase italic">(tap header to expand)</span>
+                </span>
+                <button onclick="event.stopPropagation(); exportToCSV();" class="bg-indigo-600 active:bg-indigo-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-md uppercase tracking-wide shadow-md">Export Excel (CSV)</button>
+            </div>
+            <div class="flex-1 bg-slate-950 p-3 overflow-y-auto font-mono text-[11px]" id="logList"></div>
         </div>
-        <div class="flex-1 min-h-[140px] bg-slate-950 p-3 overflow-y-auto font-mono text-[11px] border-t border-slate-900" id="logList"></div>
     </div>
 
     <script>
@@ -288,7 +316,11 @@
         // Counter Storage Object
         let counters = { totalFouls: 0, teamAFouls: 0, teamBFouls: 0, scoreHome: 0, scoreAway: 0 };
 
-        // Dynamic Configuration Loader & Saver 
+        function toggleFullscreenLogs() {
+            const container = document.getElementById("logHistoryContainer");
+            container.classList.toggle("fullscreen-logs");
+        }
+
         function savePreset() {
             const presetData = {
                 refName: document.getElementById("setupRef").value.trim(),
@@ -312,7 +344,6 @@
             }
             const parsed = JSON.parse(stored);
             
-            // 1. Sync underlying memory store
             config.refName = parsed.refName || "Ref";
             config.ar1Name = parsed.ar1Name || "AR1";
             config.ar2Name = parsed.ar2Name || "AR2";
@@ -322,7 +353,6 @@
             config.teamBName = parsed.teamBName || "Away";
             config.teamBColor = parsed.teamBColor || "#ef4444";
 
-            // 2. Sync UI Inputs so loaded variables display on screen
             document.getElementById("setupRef").value = config.refName;
             document.getElementById("setupAR1").value = config.ar1Name;
             document.getElementById("setupAR2").value = config.ar2Name;
@@ -335,7 +365,6 @@
             document.getElementById("presetStatus").textContent = "Preloaded dashboard profile successfully imported.";
         }
 
-        // Run checking algorithm automatically on page load to see if they prepped beforehand
         window.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem("refCoachPreset")) {
                 document.getElementById("presetStatus").textContent = "Saved configuration profile is available to load.";
@@ -373,7 +402,6 @@
             if(document.getElementById("lblAR2Name")) document.getElementById("lblAR2Name").textContent = config.ar2Name;
             if(document.getElementById("lbl4thName")) document.getElementById("lbl4thName").textContent = config.fourthName;
 
-            // Sync text names inside the Live Foul Counter Labels
             document.getElementById("foulCountTeamALabel").textContent = config.teamAName;
             document.getElementById("foulCountTeamBLabel").textContent = config.teamBName;
 
@@ -404,18 +432,20 @@
 
         function handleFoulToggle(element) {
             if (currentSelection.what.includes('Goal')) {
-                const goalBtn = Array.from(document.querySelectorAll('#what-group button')).find(b => b.textContent === 'Goal');
+                const goalBtn = Array.from(document.querySelectorAll('#what-group button')).find(b => b.textContent.includes('Goal'));
                 if (goalBtn) goalBtn.classList.remove('selected');
                 currentSelection.what = currentSelection.what.filter(i => i !== 'Goal');
             }
 
             toggleMulti('what', 'Foul', element);
-            const clearPanel = !currentSelection.what.includes('Foul');
+            const isFoulActive = currentSelection.what.includes('Foul');
             
             document.getElementById('foulTeamPanelTitle').textContent = "Team Committing Foul";
-            document.getElementById('foul-team-container').classList.toggle('hidden', clearPanel);
+            document.getElementById('foul-team-container').classList.toggle('hidden', !isFoulActive);
             
-            if (clearPanel) {
+            evaluateFoulSectionVisibility();
+
+            if (!isFoulActive) {
                 currentSelection.foulTeam = null;
                 document.querySelectorAll('#foul-team-group button').forEach(b => b.style.borderColor = 'transparent');
             }
@@ -429,16 +459,37 @@
             }
 
             toggleMulti('what', 'Goal', element);
-            const clearPanel = !currentSelection.what.includes('Goal');
+            const isGoalActive = currentSelection.what.includes('Goal');
             
             document.getElementById('foulTeamPanelTitle').textContent = "Team Scoring Goal";
-            document.getElementById('foul-team-container').classList.toggle('hidden', clearPanel);
+            document.getElementById('foul-team-container').classList.toggle('hidden', !isGoalActive);
             
-            if (clearPanel) {
+            showOfficialAndEvaluationSections(!isGoalActive);
+
+            if (!isGoalActive) {
                 currentSelection.foulTeam = null;
                 document.querySelectorAll('#foul-team-group button').forEach(b => b.style.borderColor = 'transparent');
             }
             checkAutoCMIs();
+        }
+
+        function evaluateFoulSectionVisibility() {
+            const whatList = currentSelection.what;
+            const isFoul = whatList.includes('Foul');
+            
+            if (isFoul && whatList.length === 1) {
+                showOfficialAndEvaluationSections(false);
+            } else if (whatList.includes('Goal')) {
+                showOfficialAndEvaluationSections(false);
+            } else {
+                showOfficialAndEvaluationSections(true);
+            }
+        }
+
+        function showOfficialAndEvaluationSections(show) {
+            const displayValue = show ? 'block' : 'none';
+            document.getElementById('officialSection').style.display = displayValue;
+            document.getElementById('evaluationSection').style.display = displayValue;
         }
 
         function selectFoulTeam(teamKey, element) {
@@ -451,10 +502,16 @@
             toggleMulti('what', 'Offside', element);
             checkDifficultyVisibility();
             checkAutoCMIs();
+            evaluateFoulSectionVisibility();
             document.getElementById('conditional-options').classList.toggle('hidden', !currentSelection.what.includes('Offside'));
         }
 
-        function handleCMIToggle(val, element) { toggleMulti('what', val, element); checkDifficultyVisibility(); checkAutoCMIs(); }
+        function handleCMIToggle(val, element) { 
+            toggleMulti('what', val, element); 
+            checkDifficultyVisibility(); 
+            checkAutoCMIs(); 
+            evaluateFoulSectionVisibility();
+        }
 
         function checkAutoCMIs() {
             const list = currentSelection.what;
@@ -560,6 +617,7 @@
             document.getElementById('conditional-options').classList.add('hidden');
             document.getElementById('foul-team-container').classList.add('hidden');
             currentSelection.foulTeam = null;
+            showOfficialAndEvaluationSections(true);
             checkDifficultyVisibility();
         }
 
@@ -568,34 +626,219 @@
             document.getElementById("cmiToggle").classList.toggle('cmi-selected', currentSelection.isCMI);
         }
 
-        function logEvent() {
-            const list = document.getElementById("logList");
-            const entry = document.createElement("div");
+        // SWIPE INTERACTION LOGIC ARCHITECTURE
+        let activeOpenRowId = null;
+
+        function attachSwipeGestures(rowWrapper, logId) {
+            let entryNode = rowWrapper.querySelector('.log-entry');
+            let startX = 0;
+            let currentX = 0;
+            let isSwiping = false;
+
+            entryNode.addEventListener('touchstart', (e) => {
+                // If another item is open, slide it closed
+                if (activeOpenRowId && activeOpenRowId !== logId) {
+                    closeActiveSwipeRow();
+                }
+                startX = e.touches[0].clientX;
+                isSwiping = true;
+            }, { passive: true });
+
+            entryNode.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                currentX = e.touches[0].clientX;
+                let diff = currentX - startX;
+
+                // Restrict extreme limits
+                if (diff > 85) diff = 85;
+                if (diff < -85) diff = -85;
+
+                entryNode.style.transform = `translateX(${diff}px)`;
+            }, { passive: true });
+
+            entryNode.addEventListener('touchend', (e) => {
+                isSwiping = false;
+                let diff = currentX - startX;
+
+                if (diff < -40) {
+                    // Snap open Left (reveals Delete on right side)
+                    entryNode.style.transform = 'translateX(-75px)';
+                    activeOpenRowId = logId;
+                } else if (diff > 40) {
+                    // Snap open Right (reveals Edit on left side)
+                    entryNode.style.transform = 'translateX(75px)';
+                    activeOpenRowId = logId;
+                } else {
+                    // Snap shut
+                    entryNode.style.transform = 'translateX(0px)';
+                    if (activeOpenRowId === logId) activeOpenRowId = null;
+                }
+            });
+        }
+
+        function closeActiveSwipeRow() {
+            if (!activeOpenRowId) return;
+            let activeWrapper = document.getElementById(`row-${activeOpenRowId}`);
+            if (activeWrapper) {
+                let entry = activeWrapper.querySelector('.log-entry');
+                if (entry) entry.style.transform = 'translateX(0px)';
+            }
+            activeOpenRowId = null;
+        }
+
+        // Document global tap detector to close open swipe containers instantly
+        document.addEventListener('touchstart', (e) => {
+            if (!e.target.closest('.log-row-wrapper')) {
+                closeActiveSwipeRow();
+            }
+        }, { passive: true });
+
+        function deleteLogEntry(logId, eventType, infractingTeam) {
+            event.stopPropagation();
             
-            let borderClass = 'border-blue-500';
-            if (currentSelection.isCMI) {
-                borderClass = 'border-red-500';
-            } else if (currentSelection.what.includes('Yellow')) {
-                borderClass = 'border-yellow-400';
-            } else if (currentSelection.what.includes('Goal')) {
-                borderClass = 'border-green-500';
+            // Adjust Counters Backwards Downwards based on deleted content type
+            if (eventType === 'Goal') {
+                if (infractingTeam === config.teamAName) { counters.scoreHome = Math.max(0, counters.scoreHome - 1); }
+                else if (infractingTeam === config.teamBName) { counters.scoreAway = Math.max(0, counters.scoreAway - 1); }
+            } else if (eventType === 'Foul' || eventType.includes('Foul')) {
+                counters.totalFouls = Math.max(0, counters.totalFouls - 1);
+                if (infractingTeam === config.teamAName) { counters.teamAFouls = Math.max(0, counters.teamAFouls - 1); }
+                else if (infractingTeam === config.teamBName) { counters.teamBFouls = Math.max(0, counters.teamBFouls - 1); }
             }
 
-            entry.className = `log-entry p-2 mb-1 border-l-4 bg-slate-800 text-slate-100 shadow-sm ${borderClass}`;
+            updateCounterUI();
             
-            let displayItems = [];
+            // Remove from items registries
+            structuredMatchLogs = structuredMatchLogs.filter(item => item.id !== logId);
+            
+            let targetRow = document.getElementById(`row-${logId}`);
+            if (targetRow) targetRow.remove();
+            activeOpenRowId = null;
+        }
+
+        function editLogEntryNote(logId) {
+            event.stopPropagation();
+            let matchedRecord = structuredMatchLogs.find(item => item.id === logId);
+            if (!matchedRecord) return;
+
+            let revisedNote = prompt("Edit Note text description content:", matchedRecord.notes);
+            if (revisedNote !== null) {
+                matchedRecord.notes = revisedNote.trim();
+                
+                // Refresh local element rendering item block view data directly
+                let noteElementBox = document.getElementById(`note-box-${logId}`);
+                if (noteElementBox) {
+                    if (matchedRecord.notes) {
+                        noteElementBox.innerHTML = `"${matchedRecord.notes}"`;
+                        noteElementBox.className = "text-slate-400 italic mt-0.5 text-[10px]";
+                    } else {
+                        noteElementBox.innerHTML = "";
+                        noteElementBox.className = "";
+                    }
+                }
+            }
+            closeActiveSwipeRow();
+        }
+
+        function logEvent() {
+            const list = document.getElementById("logList");
+            const timestamp = document.getElementById("timerDisplay").textContent;
+            const noteContent = document.getElementById('quickNote').value || '';
+            const uniqueLogId = Date.now();
+            
+            let borderClass = 'border-blue-500';
             let source = [...currentSelection.what];
-            
-            const hasOffside = source.includes('Offside') || source.includes('No Flag');
             const hasGoal = source.includes('Goal');
+            const hasFoul = source.includes('Foul');
+            const targetTeam = currentSelection.foulTeam || 'Unknown Team';
+
+            const rowWrapper = document.createElement("div");
+            rowWrapper.id = `row-${uniqueLogId}`;
+            rowWrapper.className = "log-row-wrapper";
+
+            // Add background actions elements
+            rowWrapper.innerHTML = `
+                <div class="swipe-action-container">
+                    <div onclick="editLogEntryNote(${uniqueLogId})" class="swipe-action-btn bg-blue-600 rounded-l-lg">Edit</div>
+                    <div onclick="deleteLogEntry(${uniqueLogId}, '${hasGoal ? 'Goal' : (hasFoul ? 'Foul' : 'Misc')}', '${targetTeam}')" class="swipe-action-btn bg-red-600 rounded-r-lg">Delete</div>
+                </div>
+                <div class="log-entry p-2.5 shadow-sm text-slate-100"></div>
+            `;
+            
+            const entry = rowWrapper.querySelector('.log-entry');
+
+            // --- GOAL LAYOUT SPECIFIC TRACKING ---
+            if (hasGoal) {
+                if (currentSelection.foulTeam === config.teamAName) { counters.scoreHome++; } 
+                else if (currentSelection.foulTeam === config.teamBName) { counters.scoreAway++; }
+                updateCounterUI();
+
+                const currentScoreString = `${counters.scoreHome} - ${counters.scoreAway}`;
+                entry.className += ' border-green-500';
+                entry.innerHTML = `
+                    <div class="flex justify-between font-bold text-slate-200">
+                        <span class="flex items-center text-green-400 font-black">${timestamp} | Goal (${targetTeam}) ⚽</span>
+                        <span class="text-slate-400 font-mono">Score: ${currentScoreString}</span>
+                    </div>
+                    <div id="note-box-${uniqueLogId}" class="${noteContent ? 'text-slate-400 italic mt-0.5 text-[10px]' : ''}">${noteContent ? `"${noteContent}"` : ''}</div>
+                `;
+
+                structuredMatchLogs.push({
+                    id: uniqueLogId, time: timestamp, officialRole: 'N/A', officialName: 'N/A', coords: '',
+                    incidents: `Goal (${targetTeam})`, teamInvolved: targetTeam, difficulty: 'NA',
+                    evaluation: `Score: ${currentScoreString}`, cmi: 'NO', notes: noteContent
+                });
+
+                list.insertBefore(rowWrapper, list.firstChild);
+                attachSwipeGestures(rowWrapper, uniqueLogId);
+                resetUI();
+                return;
+            }
+
+            // --- ROUTINE STANDALONE FOUL TRACKING ---
+            if (hasFoul && source.length === 1) {
+                counters.totalFouls++;
+                if (currentSelection.foulTeam === config.teamAName) { counters.teamAFouls++; } 
+                else if (currentSelection.foulTeam === config.teamBName) { counters.teamBFouls++; }
+                updateCounterUI();
+
+                entry.className += ' border-slate-500';
+                entry.innerHTML = `
+                    <div class="flex justify-between font-bold text-slate-200">
+                        <span class="text-slate-200 font-black">${timestamp} | Foul (${targetTeam})</span>
+                        <span></span>
+                    </div>
+                    <div id="note-box-${uniqueLogId}" class="${noteContent ? 'text-slate-400 italic mt-0.5 text-[10px]' : ''}">${noteContent ? `"${noteContent}"` : ''}</div>
+                `;
+
+                structuredMatchLogs.push({
+                    id: uniqueLogId, time: timestamp, officialRole: 'N/A', officialName: 'N/A', coords: '',
+                    incidents: 'Foul', teamInvolved: targetTeam, difficulty: 'RTN',
+                    evaluation: 'N/A', cmi: 'NO', notes: noteContent
+                });
+
+                list.insertBefore(rowWrapper, list.firstChild);
+                attachSwipeGestures(rowWrapper, uniqueLogId);
+                resetUI();
+                return;
+            }
+
+            // --- COMPLEX INCIDENTS CODING ENGINE (CARDS, PENALTIES, OFFSIDES) ---
+            if (currentSelection.isCMI) {
+                entry.className += ' border-red-500';
+            } else if (source.includes('Yellow')) {
+                entry.className += ' border-yellow-400';
+            } else {
+                entry.className += ' border-blue-500';
+            }
+
+            let displayItems = [];
+            const hasOffside = source.includes('Offside') || source.includes('No Flag');
 
             if (source.includes('Foul')) { 
                 counters.totalFouls++;
-                if (currentSelection.foulTeam === config.teamAName) {
-                    counters.teamAFouls++;
-                } else if (currentSelection.foulTeam === config.teamBName) {
-                    counters.teamBFouls++;
-                }
+                if (currentSelection.foulTeam === config.teamAName) { counters.teamAFouls++; } 
+                else if (currentSelection.foulTeam === config.teamBName) { counters.teamBFouls++; }
                 updateCounterUI();
 
                 let foulLabel = 'Foul';
@@ -604,68 +847,43 @@
                 source = source.filter(i => i !== 'Foul'); 
             }
 
-            if (source.includes('Goal')) {
-                if (currentSelection.foulTeam === config.teamAName) {
-                    counters.scoreHome++;
-                } else if (currentSelection.foulTeam === config.teamBName) {
-                    counters.scoreAway++;
-                }
-                updateCounterUI();
-
-                let goalLabel = 'Goal';
-                if (currentSelection.foulTeam) { goalLabel += ` (${currentSelection.foulTeam})`; }
-                displayItems.push(goalLabel);
-                source = source.filter(i => i !== 'Goal');
-            }
-
             if (source.includes('Offside')) { 
                 displayItems.push(source.includes('No Flag') ? 'Offside (Flag Down)' : 'Offside'); 
                 source = source.filter(i => i !== 'Offside' && i !== 'No Flag');
             }
             displayItems = displayItems.concat(source);
 
-            const timestamp = document.getElementById("timerDisplay").textContent;
-            
             let mappedOfficialRole = 'REF';
             let assignedName = config.refName;
             if (currentSelection.who === 'AR1') { mappedOfficialRole = 'AR1'; assignedName = config.ar1Name; }
             if (currentSelection.who === 'AR2') { mappedOfficialRole = 'AR2'; assignedName = config.ar2Name; }
             if (currentSelection.who === '4th') { mappedOfficialRole = '4th'; assignedName = config.fourthName; }
 
-            const locationCoords = currentSelection.coords || '';
             const compoundIncidents = displayItems.join(" + ");
             const metricDiff = currentSelection.difficulty || 'NA';
             const metricRating = currentSelection.rating || 'UNRATED';
-            const noteContent = document.getElementById('quickNote').value || '';
-
             const offsideIcon = hasOffside ? '<span class="ml-1.5 text-xs" title="Offside">🚩</span>' : '';
-            const goalIcon = hasGoal ? '<span class="ml-1.5 text-xs" title="Goal scored">⚽</span>' : '';
 
             structuredMatchLogs.push({
-                time: timestamp,
-                officialRole: mappedOfficialRole,
-                officialName: assignedName,
-                coords: locationCoords,
-                incidents: compoundIncidents,
-                teamInvolved: currentSelection.foulTeam || 'N/A',
-                difficulty: metricDiff,
-                evaluation: metricRating,
-                cmi: currentSelection.isCMI ? 'YES' : 'NO',
-                notes: noteContent
+                id: uniqueLogId, time: timestamp, officialRole: mappedOfficialRole, officialName: assignedName, coords: '',
+                incidents: compoundIncidents, teamInvolved: currentSelection.foulTeam || 'N/A',
+                difficulty: metricDiff, evaluation: metricRating, cmi: currentSelection.isCMI ? 'YES' : 'NO', notes: noteContent
             });
 
             entry.innerHTML = `
                 <div class="flex justify-between font-bold text-slate-200">
-                    <span class="flex items-center">${timestamp} | ${mappedOfficialRole} (${assignedName})${offsideIcon}${goalIcon}</span>
-                    <span class="text-slate-500 font-normal">${locationCoords}</span>
+                    <span class="flex items-center">${timestamp} | ${mappedOfficialRole} (${assignedName})${offsideIcon}</span>
+                    <span class="text-slate-500 font-normal"></span>
                 </div>
                 <div class="text-slate-300 mt-0.5">
                     ${compoundIncidents} [${metricDiff}] — <span class="italic font-bold text-blue-400">${metricRating}</span> 
                     ${currentSelection.isCMI ? '<b class="text-red-400 ml-1">[CMI]</b>' : ''}
                 </div>
-                ${noteContent ? `<div class="text-slate-400 italic mt-0.5 text-[10px]">"${noteContent}"</div>` : ''}
+                <div id="note-box-${uniqueLogId}" class="${noteContent ? 'text-slate-400 italic mt-0.5 text-[10px]' : ''}">${noteContent ? `"${noteContent}"` : ''}</div>
             `;
-            list.insertBefore(entry, list.firstChild);
+            
+            list.insertBefore(rowWrapper, list.firstChild);
+            attachSwipeGestures(rowWrapper, uniqueLogId);
             resetUI();
         }
 
@@ -718,6 +936,7 @@
             document.getElementById('foul-team-container').classList.add('hidden');
             document.getElementById('difficulty-options').classList.add('hidden');
             document.getElementById('quickNote').value = "";
+            showOfficialAndEvaluationSections(true);
         }
 
         function resetTimer() { 
@@ -729,6 +948,7 @@
                 document.getElementById("startTimerBtn").textContent = "Start";
                 clearAllLogs();
                 resetUI();
+                document.getElementById("logHistoryContainer").classList.remove("fullscreen-logs");
                 document.getElementById("matchScreen").classList.remove("light-theme");
                 document.getElementById("themeToggleBtn").textContent = "☀️";
                 document.getElementById("matchScreen").classList.add("hidden");
