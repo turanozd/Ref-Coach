@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Ref Coach Pro</title>
     
+    <!-- PWA Manifest Base64 Data URI -->
     <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlJlZiBDb2FjaCBQcm8iLAogICJzaG9ydF9uYW1lIjogIlJlZkxvZ2dlciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAmZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBmMTcyYSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzgwNy84MDczNjcucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -78,16 +79,22 @@
         #matchScreen.light-theme .log-entry .text-blue-400 { color: #2563eb !important; }
         #matchScreen.light-theme .log-entry .text-slate-500 { color: #6b7280 !important; }
         #matchScreen.light-theme .log-entry .text-red-400 { color: #dc2626 !important; }
+
+        /* FOUL COUNTER THEME ADJUSTMENTS */
+        #matchScreen.light-theme #foul-counter-dashboard { background-color: #e5e7eb !important; border-color: #d1d5db !important; color: #1f2937 !important; }
+        #matchScreen.light-theme #foul-counter-dashboard span { color: #4b5563 !important; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans flex flex-col h-screen overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800">
 
+    <!-- SCREEN 1: PRE-MATCH SETUP INTRO PAGE -->
     <div id="setupScreen" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-slate-900 text-white">
         <div class="text-center py-1">
             <h1 class="text-2xl font-black text-green-400 tracking-tight uppercase">Ref Coach Pro</h1>
             <p class="text-xs text-slate-400">Pre-Match Configurations</p>
         </div>
 
+        <!-- Crew Setup -->
         <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-3">
             <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-1">1. Match Officials</h2>
             <div>
@@ -110,9 +117,11 @@
             </div>
         </div>
 
+        <!-- Teams Setup -->
         <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-4">
             <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider">2. Team Configuration</h2>
             
+            <!-- Team A -->
             <div class="flex items-end gap-3">
                 <div class="flex-1">
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Home Team / Team A Name</label>
@@ -124,6 +133,7 @@
                 </div>
             </div>
 
+            <!-- Team B -->
             <div class="flex items-end gap-3">
                 <div class="flex-1">
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Away Team / Team B Name</label>
@@ -136,6 +146,7 @@
             </div>
         </div>
 
+        <!-- Configuration Memory Slots -->
         <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex flex-col gap-2">
             <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider">3. Configuration Memory Slots</h2>
             <div class="grid grid-cols-2 gap-2">
@@ -145,12 +156,14 @@
             <p id="presetStatus" class="text-[10px] text-slate-400 text-center italic mt-0.5">No loaded configuration data.</p>
         </div>
 
+        <!-- Proceed Action -->
         <button onclick="commitSetup()" class="w-full bg-green-500 active:bg-green-600 text-slate-950 font-black py-4 rounded-xl text-center uppercase tracking-wide text-sm shadow-lg">
             Proceed to Match Dashboard &rarr;
         </button>
     </div>
 
 
+    <!-- SCREEN 2: MAIN RECORDING INTERFACE -->
     <div id="matchScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-900">
         <header class="bg-slate-950 text-white p-3 flex justify-between items-center shadow-md gap-1 border-b border-slate-800">
             <button onclick="goBackToSetup()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] font-black uppercase px-2 py-2 rounded-lg tracking-wide">&larr; Setup</button>
@@ -162,7 +175,9 @@
             </div>
         </header>
 
+        <!-- Main dashboard content wrapper -->
         <main class="overflow-y-auto p-3 flex flex-col gap-4">
+            <!-- 1. OFFICIAL -->
             <section>
                 <h2 class="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">1. Official</h2>
                 <div class="grid grid-cols-4 gap-1.5" id="who-group">
@@ -185,6 +200,7 @@
                 </div>
             </section>
 
+            <!-- 2. POSITION -->
             <section>
                 <div class="flex justify-between items-center mb-1">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">2. Position</h2>
@@ -201,11 +217,29 @@
                 </div>
             </section>
 
+            <!-- 3. INCIDENT TYPE -->
             <section>
                 <div class="flex justify-between items-center mb-1">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">3. Incident Type</h2>
                     <button onclick="clearMulti('what')" class="text-[10px] text-blue-400 font-bold uppercase tracking-wide">Clear</button>
                 </div>
+
+                <!-- LIVE FOUL COUNTER DASHBOARD CONTAINER -->
+                <div id="foul-counter-dashboard" class="mb-2 bg-slate-950 border border-slate-800 p-2 rounded-lg grid grid-cols-3 text-center font-mono text-xs items-center shadow-inner">
+                    <div class="border-r border-slate-800/80">
+                        <span class="text-[9px] text-slate-500 block font-bold uppercase tracking-wide">Total Fouls</span>
+                        <span id="foulCountTotal" class="text-base font-black text-slate-100">0</span>
+                    </div>
+                    <div class="border-r border-slate-800/80">
+                        <span id="foulCountTeamALabel" class="text-[9px] text-blue-400 block font-bold uppercase truncate px-1">Home</span>
+                        <span id="foulCountTeamA" class="text-base font-black text-blue-400">0</span>
+                    </div>
+                    <div>
+                        <span id="foulCountTeamBLabel" class="text-[9px] text-red-400 block font-bold uppercase truncate px-1">Away</span>
+                        <span id="foulCountTeamB" class="text-base font-black text-red-400">0</span>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-3 gap-1.5" id="what-group">
                     <button onclick="handleFoulToggle(this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-slate-200">Foul</button>
                     <button onclick="handleOffsideToggle(this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-slate-200">Offside</button>
@@ -218,6 +252,7 @@
                     <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-[10px] text-slate-200">Mistaken ID</button>
                 </div>
 
+                <!-- Conditional Foul Team Selector -->
                 <div id="foul-team-container" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
                     <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Team Committing Foul</p>
                     <div class="flex gap-2" id="foul-team-group">
@@ -226,12 +261,14 @@
                     </div>
                 </div>
 
+                <!-- Conditional Offside Selector -->
                 <div id="conditional-options" class="mt-2 hidden">
                     <button id="noFlagBtn" onclick="toggleMulti('what', 'No Flag', this)" class="w-full bg-indigo-950/60 border-2 border-indigo-800 py-3 rounded-lg font-black text-indigo-300">
                         OFFSIDE: No Flag / Stayed Down
                     </button>
                 </div>
 
+                <!-- Difficulty Selector -->
                 <div id="difficulty-options" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
                     <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Difficulty</p>
                     <div class="flex gap-1.5" id="difficulty-group">
@@ -242,6 +279,7 @@
                 </div>
             </section>
 
+            <!-- 4. EVALUATION -->
             <section>
                 <div class="flex gap-1.5" id="rating-group">
                     <button onclick="selectSingle('rating', 'Correct', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-green-400">CORRECT</button>
@@ -250,6 +288,7 @@
                 </div>
             </section>
 
+            <!-- 5. SAVE ACTION -->
             <section>
                 <div class="flex gap-2">
                     <input type="text" id="quickNote" placeholder="Notes..." class="flex-1 p-4 rounded-xl border border-slate-700 bg-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
@@ -258,6 +297,7 @@
             </section>
         </main>
 
+        <!-- Footer Control Row & Log Panel -->
         <div class="bg-slate-950 p-2 px-3 flex justify-between items-center border-t border-slate-800 shadow-inner">
             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Match Log History</span>
             <button onclick="exportToCSV()" class="bg-indigo-600 active:bg-indigo-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-md uppercase tracking-wide shadow-md">Export Excel (CSV)</button>
@@ -282,6 +322,9 @@
         let currentSelection = { who: null, what: [], foulTeam: null, rating: null, isCMI: false, coords: null, difficulty: null };
         let timerInterval, seconds = 0, isRunning = false;
         let structuredMatchLogs = [];
+        
+        // Counter Storage Object
+        let counters = { totalFouls: 0, teamAFouls: 0, teamBFouls: 0 };
 
         // Dynamic Configuration Loader & Saver 
         function savePreset() {
@@ -368,6 +411,10 @@
             if(document.getElementById("lblAR2Name")) document.getElementById("lblAR2Name").textContent = config.ar2Name;
             if(document.getElementById("lbl4thName")) document.getElementById("lbl4thName").textContent = config.fourthName;
 
+            // Sync text names inside the Live Foul Counter Labels
+            document.getElementById("foulCountTeamALabel").textContent = config.teamAName;
+            document.getElementById("foulCountTeamBLabel").textContent = config.teamBName;
+
             const btnFoulA = document.getElementById("foulTeamABtn");
             if(btnFoulA) {
                 btnFoulA.textContent = config.teamAName;
@@ -453,6 +500,15 @@
         function clearAllLogs() {
             document.getElementById("logList").innerHTML = "";
             structuredMatchLogs = [];
+            // Reset numerical counters
+            counters = { totalFouls: 0, teamAFouls: 0, teamBFouls: 0 };
+            updateCounterUI();
+        }
+
+        function updateCounterUI() {
+            document.getElementById("foulCountTotal").textContent = counters.totalFouls;
+            document.getElementById("foulCountTeamA").textContent = counters.teamAFouls;
+            document.getElementById("foulCountTeamB").textContent = counters.teamBFouls;
         }
 
         function updateTimerDisplay() {
@@ -497,6 +553,13 @@
             if (wasRunning) { toggleTimer(); }
         }
 
+        function selectSingle('rating', val, el) {
+            document.querySelectorAll(`#rating-group button`).forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            currentSelection.rating = val;
+        }
+        
+        // Overload to support separate tracking for Who context selector
         function selectSingle(cat, val, el) {
             document.querySelectorAll(`#${cat}-group button`).forEach(b => b.classList.remove('selected'));
             el.classList.add('selected');
@@ -547,7 +610,16 @@
             // CHECK FOR OFFSIDE BEFORE PARSING STATE
             const hasOffside = source.includes('Offside') || source.includes('No Flag');
 
+            // LIVE FOUL UPDATER INCREMENT ENGINE
             if (source.includes('Foul')) { 
+                counters.totalFouls++;
+                if (currentSelection.foulTeam === config.teamAName) {
+                    counters.teamAFouls++;
+                } else if (currentSelection.foulTeam === config.teamBName) {
+                    counters.teamBFouls++;
+                }
+                updateCounterUI();
+
                 let foulLabel = 'Foul';
                 if (currentSelection.foulTeam) { foulLabel += ` (${currentSelection.foulTeam})`; }
                 displayItems.push(foulLabel); 
