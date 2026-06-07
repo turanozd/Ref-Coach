@@ -1,10 +1,3 @@
-The issue is happening because the JavaScript code trying to target the names inside your live foul counter (`foulCountTeamALabel` and `foulCountTeamBLabel`) runs inside the `commitSetup()` function *before* those elements actually exist on the page if you just pasted the code over.
-
-When a script hits an error like that, it stops executing immediately, which freezes the "Proceed" button completely.
-
-Here is the fixed, production-ready `index.html` file code block with the initialization script re-ordered safely. Replace your entire GitHub file with this:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -752,5 +745,3 @@ Here is the fixed, production-ready `index.html` file code block with the initia
     </script>
 </body>
 </html>
-
-```
