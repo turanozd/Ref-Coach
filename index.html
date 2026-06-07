@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Ref Coach Pro</title>
     
+    <!-- PWA Manifest Base64 Data URI -->
     <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlJlZiBDb2FjaCBQcm8iLAogICJzaG9ydF9uYW1lIjogIlJlZkxvZ2dlciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAmZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBmMTcyYSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzgwNy84MDczNjcucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -82,12 +83,14 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans flex flex-col h-screen overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800">
 
+    <!-- SCREEN 1: PRE-MATCH SETUP INTRO PAGE -->
     <div id="setupScreen" class="flex-1 overflow-y-auto p-4 flex flex-col gap-5 bg-slate-900 text-white">
         <div class="text-center py-2">
             <h1 class="text-2xl font-black text-green-400 tracking-tight uppercase">Ref Coach Pro</h1>
             <p class="text-xs text-slate-400">Pre-Match Configurations</p>
         </div>
 
+        <!-- Crew Setup -->
         <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-3">
             <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-1">1. Match Officials</h2>
             <div>
@@ -110,9 +113,11 @@
             </div>
         </div>
 
+        <!-- Teams Setup -->
         <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-4">
             <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider">2. Team Configuration</h2>
             
+            <!-- Team A -->
             <div class="flex items-end gap-3">
                 <div class="flex-1">
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Home Team / Team A Name</label>
@@ -124,6 +129,7 @@
                 </div>
             </div>
 
+            <!-- Team B -->
             <div class="flex items-end gap-3">
                 <div class="flex-1">
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Away Team / Team B Name</label>
@@ -136,12 +142,14 @@
             </div>
         </div>
 
+        <!-- Proceed Action -->
         <button onclick="commitSetup()" class="w-full bg-green-500 active:bg-green-600 text-slate-950 font-black py-4 rounded-xl text-center uppercase tracking-wide text-sm shadow-lg mt-auto">
             Proceed to Match Dashboard &rarr;
         </button>
     </div>
 
 
+    <!-- SCREEN 2: MAIN RECORDING INTERFACE -->
     <div id="matchScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-900">
         <header class="bg-slate-950 text-white p-3 flex justify-between items-center shadow-md gap-1 border-b border-slate-800">
             <button onclick="goBackToSetup()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] font-black uppercase px-2 py-2 rounded-lg tracking-wide">&larr; Setup</button>
@@ -153,7 +161,9 @@
             </div>
         </header>
 
+        <!-- Main dashboard content wrapper -->
         <main class="overflow-y-auto p-3 flex flex-col gap-4">
+            <!-- 1. OFFICIAL -->
             <section>
                 <h2 class="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">1. Official</h2>
                 <div class="grid grid-cols-4 gap-1.5" id="who-group">
@@ -176,6 +186,7 @@
                 </div>
             </section>
 
+            <!-- 2. POSITION -->
             <section>
                 <div class="flex justify-between items-center mb-1">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">2. Position</h2>
@@ -192,6 +203,7 @@
                 </div>
             </section>
 
+            <!-- 3. INCIDENT TYPE -->
             <section>
                 <div class="flex justify-between items-center mb-1">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">3. Incident Type</h2>
@@ -209,6 +221,7 @@
                     <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-[10px] text-slate-200">Mistaken ID</button>
                 </div>
 
+                <!-- Conditional Foul Team Selector -->
                 <div id="foul-team-container" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
                     <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Team Committing Foul</p>
                     <div class="flex gap-2" id="foul-team-group">
@@ -217,12 +230,14 @@
                     </div>
                 </div>
 
+                <!-- Conditional Offside Selector -->
                 <div id="conditional-options" class="mt-2 hidden">
                     <button id="noFlagBtn" onclick="toggleMulti('what', 'No Flag', this)" class="w-full bg-indigo-950/60 border-2 border-indigo-800 py-3 rounded-lg font-black text-indigo-300">
                         OFFSIDE: No Flag / Stayed Down
                     </button>
                 </div>
 
+                <!-- Difficulty Selector -->
                 <div id="difficulty-options" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
                     <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Difficulty</p>
                     <div class="flex gap-1.5" id="difficulty-group">
@@ -233,6 +248,7 @@
                 </div>
             </section>
 
+            <!-- 4. EVALUATION -->
             <section>
                 <div class="flex gap-1.5" id="rating-group">
                     <button onclick="selectSingle('rating', 'Correct', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-green-400">CORRECT</button>
@@ -241,6 +257,7 @@
                 </div>
             </section>
 
+            <!-- 5. SAVE ACTION -->
             <section>
                 <div class="flex gap-2">
                     <input type="text" id="quickNote" placeholder="Notes..." class="flex-1 p-4 rounded-xl border border-slate-700 bg-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
@@ -249,6 +266,7 @@
             </section>
         </main>
 
+        <!-- Footer Control Row & Log Panel -->
         <div class="bg-slate-950 p-2 px-3 flex justify-between items-center border-t border-slate-800 shadow-inner">
             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Match Log History</span>
             <button onclick="exportToCSV()" class="bg-indigo-600 active:bg-indigo-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-md uppercase tracking-wide shadow-md">Export Excel (CSV)</button>
@@ -434,7 +452,7 @@
             if (wasRunning) { toggleTimer(); }
         }
 
-        function selectSingle(cat, val, el) {
+        function selectSingle('cat', val, el) {
             document.querySelectorAll(`#${cat}-group button`).forEach(b => b.classList.remove('selected'));
             el.classList.add('selected');
             currentSelection[cat] = val;
@@ -465,83 +483,81 @@
         }
 
         function logEvent() {
-    const list = document.getElementById("logList");
-    const entry = document.createElement("div");
-    
-    // 1. DYNAMIC BORDER COLOR LOGIC
-    // Default to blue. Change to red if CMI, or yellow if it's a standard Yellow Card
-    let borderClass = 'border-blue-500';
-    if (currentSelection.isCMI) {
-        borderClass = 'border-red-500';
-    } else if (currentSelection.what.includes('Yellow')) {
-        borderClass = 'border-yellow-400';
-    }
+            const list = document.getElementById("logList");
+            const entry = document.createElement("div");
+            
+            // DYNAMIC SIDEWALL COLOR LOGIC
+            let borderClass = 'border-blue-500';
+            if (currentSelection.isCMI) {
+                borderClass = 'border-red-500';
+            } else if (currentSelection.what.includes('Yellow')) {
+                borderClass = 'border-yellow-400';
+            }
 
-    entry.className = `log-entry p-2 mb-1 border-l-4 bg-slate-800 text-slate-100 shadow-sm ${borderClass}`;
-    
-    let displayItems = [];
-    let source = [...currentSelection.what];
-    
-    // 2. CHECK FOR OFFSIDE BEFORE MODIFYING ARRAYS
-    const hasOffside = source.includes('Offside') || source.includes('No Flag');
+            entry.className = `log-entry p-2 mb-1 border-l-4 bg-slate-800 text-slate-100 shadow-sm ${borderClass}`;
+            
+            let displayItems = [];
+            let source = [...currentSelection.what];
+            
+            // CHECK FOR OFFSIDE BEFORE PARSING STATE
+            const hasOffside = source.includes('Offside') || source.includes('No Flag');
 
-    if (source.includes('Foul')) { 
-        let foulLabel = 'Foul';
-        if (currentSelection.foulTeam) { foulLabel += ` (${currentSelection.foulTeam})`; }
-        displayItems.push(foulLabel); 
-        source = source.filter(i => i !== 'Foul'); 
-    }
-    if (source.includes('Offside')) { 
-        displayItems.push(source.includes('No Flag') ? 'Offside (Flag Down)' : 'Offside'); 
-        source = source.filter(i => i !== 'Offside' && i !== 'No Flag');
-    }
-    displayItems = displayItems.concat(source);
+            if (source.includes('Foul')) { 
+                let foulLabel = 'Foul';
+                if (currentSelection.foulTeam) { foulLabel += ` (${currentSelection.foulTeam})`; }
+                displayItems.push(foulLabel); 
+                source = source.filter(i => i !== 'Foul'); 
+            }
+            if (source.includes('Offside')) { 
+                displayItems.push(source.includes('No Flag') ? 'Offside (Flag Down)' : 'Offside'); 
+                source = source.filter(i => i !== 'Offside' && i !== 'No Flag');
+            }
+            displayItems = displayItems.concat(source);
 
-    const timestamp = document.getElementById("timerDisplay").textContent;
-    
-    let mappedOfficialRole = 'REF';
-    let assignedName = config.refName;
-    if (currentSelection.who === 'AR1') { mappedOfficialRole = 'AR1'; assignedName = config.ar1Name; }
-    if (currentSelection.who === 'AR2') { mappedOfficialRole = 'AR2'; assignedName = config.ar2Name; }
-    if (currentSelection.who === '4th') { mappedOfficialRole = '4th'; assignedName = config.fourthName; }
+            const timestamp = document.getElementById("timerDisplay").textContent;
+            
+            let mappedOfficialRole = 'REF';
+            let assignedName = config.refName;
+            if (currentSelection.who === 'AR1') { mappedOfficialRole = 'AR1'; assignedName = config.ar1Name; }
+            if (currentSelection.who === 'AR2') { mappedOfficialRole = 'AR2'; assignedName = config.ar2Name; }
+            if (currentSelection.who === '4th') { mappedOfficialRole = '4th'; assignedName = config.fourthName; }
 
-    const locationCoords = currentSelection.coords || '';
-    const compoundIncidents = displayItems.join(" + ");
-    const metricDiff = currentSelection.difficulty || 'NA';
-    const metricRating = currentSelection.rating || 'UNRATED';
-    const noteContent = document.getElementById('quickNote').value || '';
+            const locationCoords = currentSelection.coords || '';
+            const compoundIncidents = displayItems.join(" + ");
+            const metricDiff = currentSelection.difficulty || 'NA';
+            const metricRating = currentSelection.rating || 'UNRATED';
+            const noteContent = document.getElementById('quickNote').value || '';
 
-    // 3. CREATE THE FLAG ICON HTML STRING IF OFFSIDE WAS LOGGED
-    const offsideIcon = hasOffside ? '<span class="ml-1.5 text-xs" title="Offside">🚩</span>' : '';
+            // GENERATE FLAGS IF APPLICABLE
+            const offsideIcon = hasOffside ? '<span class="ml-1.5 text-xs" title="Offside">🚩</span>' : '';
 
-    structuredMatchLogs.push({
-        time: timestamp,
-        officialRole: mappedOfficialRole,
-        officialName: assignedName,
-        coords: locationCoords,
-        incidents: compoundIncidents,
-        teamInvolved: currentSelection.foulTeam || 'N/A',
-        difficulty: metricDiff,
-        evaluation: metricRating,
-        cmi: currentSelection.isCMI ? 'YES' : 'NO',
-        notes: noteContent
-    });
+            structuredMatchLogs.push({
+                time: timestamp,
+                officialRole: mappedOfficialRole,
+                officialName: assignedName,
+                coords: locationCoords,
+                incidents: compoundIncidents,
+                teamInvolved: currentSelection.foulTeam || 'N/A',
+                difficulty: metricDiff,
+                evaluation: metricRating,
+                cmi: currentSelection.isCMI ? 'YES' : 'NO',
+                notes: noteContent
+            });
 
-    // 4. INJECT THE FLAG (offsideIcon) NEXT TO THE OFFICIAL'S NAME
-    entry.innerHTML = `
-        <div class="flex justify-between font-bold text-slate-200">
-            <span class="flex items-center">${timestamp} | ${mappedOfficialRole} (${assignedName})${offsideIcon}</span>
-            <span class="text-slate-500 font-normal">${locationCoords}</span>
-        </div>
-        <div class="text-slate-300 mt-0.5">
-            ${compoundIncidents} [${metricDiff}] — <span class="italic font-bold text-blue-400">${metricRating}</span> 
-            ${currentSelection.isCMI ? '<b class="text-red-400 ml-1">[CMI]</b>' : ''}
-        </div>
-        ${noteContent ? `<div class="text-slate-400 italic mt-0.5 text-[10px]">"${noteContent}"</div>` : ''}
-    `;
-    list.insertBefore(entry, list.firstChild);
-    resetUI();
-}
+            entry.innerHTML = `
+                <div class="flex justify-between font-bold text-slate-200">
+                    <span class="flex items-center">${timestamp} | ${mappedOfficialRole} (${assignedName})${offsideIcon}</span>
+                    <span class="text-slate-500 font-normal">${locationCoords}</span>
+                </div>
+                <div class="text-slate-300 mt-0.5">
+                    ${compoundIncidents} [${metricDiff}] — <span class="italic font-bold text-blue-400">${metricRating}</span> 
+                    ${currentSelection.isCMI ? '<b class="text-red-400 ml-1">[CMI]</b>' : ''}
+                </div>
+                ${noteContent ? `<div class="text-slate-400 italic mt-0.5 text-[10px]">"${noteContent}"</div>` : ''}
+            `;
+            list.insertBefore(entry, list.firstChild);
+            resetUI();
+        }
 
         function exportToCSV() {
             if (structuredMatchLogs.length === 0) {
