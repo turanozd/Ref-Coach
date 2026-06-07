@@ -452,11 +452,11 @@
             if (wasRunning) { toggleTimer(); }
         }
 
-        function selectSingle('cat', val, el) {
-            document.querySelectorAll(`#${cat}-group button`).forEach(b => b.classList.remove('selected'));
-            el.classList.add('selected');
-            currentSelection[cat] = val;
-        }
+        function selectSingle(cat, val, el) {
+    document.querySelectorAll(`#${cat}-group button`).forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    currentSelection[cat] = val;
+}
 
         function toggleMulti(cat, val, el) {
             if (currentSelection[cat].includes(val)) {
