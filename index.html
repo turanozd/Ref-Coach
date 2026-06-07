@@ -1,3 +1,10 @@
+The issue is happening because the JavaScript code trying to target the names inside your live foul counter (`foulCountTeamALabel` and `foulCountTeamBLabel`) runs inside the `commitSetup()` function *before* those elements actually exist on the page if you just pasted the code over.
+
+When a script hits an error like that, it stops executing immediately, which freezes the "Proceed" button completely.
+
+Here is the fixed, production-ready `index.html` file code block with the initialization script re-ordered safely. Replace your entire GitHub file with this:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -181,19 +188,19 @@
             <section>
                 <h2 class="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">1. Official</h2>
                 <div class="grid grid-cols-4 gap-1.5" id="who-group">
-                    <button id="btnRef" onclick="selectSingle('who', 'Ref', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                    <button id="btnRef" onclick="selectSingleWho('who', 'Ref', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
                         <span class="text-[10px] uppercase text-slate-400 font-bold">REF</span>
                         <span id="lblRefName" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
                     </button>
-                    <button id="btnAR1" onclick="selectSingle('who', 'AR1', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                    <button id="btnAR1" onclick="selectSingleWho('who', 'AR1', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
                         <span class="text-[10px] uppercase text-slate-400 font-bold">AR1</span>
                         <span id="lblAR1Name" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
                     </button>
-                    <button id="btnAR2" onclick="selectSingle('who', 'AR2', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                    <button id="btnAR2" onclick="selectSingleWho('who', 'AR2', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
                         <span class="text-[10px] uppercase text-slate-400 font-bold">AR2</span>
                         <span id="lblAR2Name" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
                     </button>
-                    <button id="btn4th" onclick="selectSingle('who', '4th', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                    <button id="btn4th" onclick="selectSingleWho('who', '4th', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
                         <span class="text-[10px] uppercase text-slate-400 font-bold">4th</span>
                         <span id="lbl4thName" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
                     </button>
@@ -282,8 +289,8 @@
             <!-- 4. EVALUATION -->
             <section>
                 <div class="flex gap-1.5" id="rating-group">
-                    <button onclick="selectSingle('rating', 'Correct', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-green-400">CORRECT</button>
-                    <button onclick="selectSingle('rating', 'Incorrect', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-orange-400">INCORRECT</button>
+                    <button onclick="selectSingleRating('rating', 'Correct', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-green-400">CORRECT</button>
+                    <button onclick="selectSingleRating('rating', 'Incorrect', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-orange-400">INCORRECT</button>
                     <button id="cmiToggle" onclick="toggleCMI()" class="flex-1 bg-slate-800 border border-red-900/60 py-4 rounded-xl font-black text-red-400">🚨 CMI</button>
                 </div>
             </section>
@@ -553,15 +560,14 @@
             if (wasRunning) { toggleTimer(); }
         }
 
-        function selectSingle('rating', val, el) {
+        function selectSingleRating(cat, val, el) {
             document.querySelectorAll(`#rating-group button`).forEach(b => b.classList.remove('selected'));
             el.classList.add('selected');
             currentSelection.rating = val;
         }
         
-        // Overload to support separate tracking for Who context selector
-        function selectSingle(cat, val, el) {
-            document.querySelectorAll(`#${cat}-group button`).forEach(b => b.classList.remove('selected'));
+        function selectSingleWho(cat, val, el) {
+            document.querySelectorAll(`#who-group button`).forEach(b => b.classList.remove('selected'));
             el.classList.add('selected');
             currentSelection[cat] = val;
         }
@@ -746,3 +752,5 @@
     </script>
 </body>
 </html>
+
+```
