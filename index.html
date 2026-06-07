@@ -7,7 +7,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Ref Coach Pro</title>
     
-    <!-- PWA Manifest Base64 Data URI -->
     <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlJlZiBDb2FjaCBQcm8iLAogICJzaG9ydF9uYW1lIjogIlJlZkxvZ2dlciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAmZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBmMTcyYSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzgwNy84MDczNjcucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,20 +16,6 @@
         .selected { background-color: #3b82f6 !important; color: white !important; border-color: #2563eb !important; }
         .diff-selected { background-color: #475569 !important; color: white !important; border-color: #94a3b8 !important; }
         .cmi-selected { background-color: #ef4444 !important; color: white !important; border-color: #dc2626 !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
-        
-        .field-canvas { position: relative; width: 100%; height: 180px; background: #16a34a; border: 2px solid rgba(255,255,255,0.6); border-radius: 6px; cursor: crosshair; }
-        .field-line { position: absolute; border: 1.5px solid rgba(255,255,255,0.6); pointer-events: none; }
-        .half-line { left: 50%; top: 0; bottom: 0; width: 0; }
-        .center-circle { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 45px; height: 45px; border-radius: 50%; }
-        .pen-box-l { left: 0; top: 20%; width: 40px; height: 60%; border-left: none; }
-        .pen-box-r { right: 0; top: 20%; width: 40px; height: 60%; border-right: none; }
-        
-        #pin { 
-            position: absolute; width: 22px; height: 22px; 
-            background: #ef4444; border: 3px solid white; border-radius: 50%; 
-            transform: translate(-50%, -50%); display: none; z-index: 50; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5); pointer-events: none;
-        }
 
         /* DYNAMIC LIGHT THEME OVERRIDES FOR SECOND SCREEN */
         #matchScreen.light-theme { background-color: #f3f4f6 !important; color: #1f2937 !important; }
@@ -83,18 +68,20 @@
         /* FOUL COUNTER THEME ADJUSTMENTS */
         #matchScreen.light-theme #foul-counter-dashboard { background-color: #e5e7eb !important; border-color: #d1d5db !important; color: #1f2937 !important; }
         #matchScreen.light-theme #foul-counter-dashboard span { color: #4b5563 !important; }
+
+        /* MATCH SCORE HEADER STYLES */
+        #matchScreen.light-theme #liveScoreboardHeader { background-color: #e5e7eb !important; border-color: #cbd5e1 !important; }
+        #matchScreen.light-theme .score-digit { background-color: #ffffff !important; color: #111827 !important; border-color: #cbd5e1 !important; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans flex flex-col h-screen overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800">
 
-    <!-- SCREEN 1: PRE-MATCH SETUP INTRO PAGE -->
     <div id="setupScreen" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-slate-900 text-white">
         <div class="text-center py-1">
             <h1 class="text-2xl font-black text-green-400 tracking-tight uppercase">Ref Coach Pro</h1>
             <p class="text-xs text-slate-400">Pre-Match Configurations</p>
         </div>
 
-        <!-- Crew Setup -->
         <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-3">
             <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-1">1. Match Officials</h2>
             <div>
@@ -117,11 +104,9 @@
             </div>
         </div>
 
-        <!-- Teams Setup -->
         <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-4">
             <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider">2. Team Configuration</h2>
             
-            <!-- Team A -->
             <div class="flex items-end gap-3">
                 <div class="flex-1">
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Home Team / Team A Name</label>
@@ -133,7 +118,6 @@
                 </div>
             </div>
 
-            <!-- Team B -->
             <div class="flex items-end gap-3">
                 <div class="flex-1">
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Away Team / Team B Name</label>
@@ -146,7 +130,6 @@
             </div>
         </div>
 
-        <!-- Configuration Memory Slots -->
         <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex flex-col gap-2">
             <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider">3. Configuration Memory Slots</h2>
             <div class="grid grid-cols-2 gap-2">
@@ -156,28 +139,32 @@
             <p id="presetStatus" class="text-[10px] text-slate-400 text-center italic mt-0.5">No loaded configuration data.</p>
         </div>
 
-        <!-- Proceed Action -->
         <button onclick="commitSetup()" class="w-full bg-green-500 active:bg-green-600 text-slate-950 font-black py-4 rounded-xl text-center uppercase tracking-wide text-sm shadow-lg">
             Proceed to Match Dashboard &rarr;
         </button>
     </div>
 
 
-    <!-- SCREEN 2: MAIN RECORDING INTERFACE -->
     <div id="matchScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-900">
-        <header class="bg-slate-950 text-white p-3 flex justify-between items-center shadow-md gap-1 border-b border-slate-800">
-            <button onclick="goBackToSetup()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] font-black uppercase px-2 py-2 rounded-lg tracking-wide">&larr; Setup</button>
-            <div id="timerDisplay" onclick="adjustTimer()" class="text-2xl font-mono font-bold text-green-400 cursor-pointer select-none hover:text-green-300 transition-colors" title="Tap to adjust time">00:00</div>
-            <div class="flex gap-1 items-center">
+        <header class="bg-slate-950 text-white p-2.5 flex justify-between items-center shadow-md gap-2 border-b border-slate-800">
+            <button onclick="goBackToSetup()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] font-black uppercase px-2 py-2 rounded-lg tracking-wide shrink-0">&larr; Setup</button>
+            
+            <div id="timerDisplay" onclick="adjustTimer()" class="text-2xl font-mono font-bold text-green-400 cursor-pointer select-none hover:text-green-300 transition-colors shrink-0" title="Tap to adjust time">00:00</div>
+            
+            <div id="liveScoreboardHeader" class="bg-slate-900 border border-slate-800/80 px-2 py-1 rounded-lg flex items-center gap-1 font-mono font-bold text-xs shadow-inner">
+                <div id="scoreHomeBox" class="score-digit bg-slate-950 px-1.5 py-0.5 rounded text-blue-400 min-w-[16px] text-center">0</div>
+                <div class="text-slate-500 text-[10px] px-0.5">:</div>
+                <div id="scoreAwayBox" class="score-digit bg-slate-950 px-1.5 py-0.5 rounded text-red-400 min-w-[16px] text-center">0</div>
+            </div>
+
+            <div class="flex gap-1 items-center shrink-0">
                 <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-slate-800 border border-slate-700 px-2.5 py-1.5 rounded-lg text-xs" title="Toggle Light/Dark Theme">☀️</button>
                 <button id="startTimerBtn" onclick="toggleTimer()" class="bg-green-600 px-2.5 py-1.5 rounded-lg font-bold uppercase text-[10px]">Start</button>
                 <button onclick="resetTimer()" class="bg-slate-700 px-2 py-1.5 rounded-lg text-[10px] font-bold uppercase">Reset</button>
             </div>
         </header>
 
-        <!-- Main dashboard content wrapper -->
         <main class="overflow-y-auto p-3 flex flex-col gap-4">
-            <!-- 1. OFFICIAL -->
             <section>
                 <h2 class="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">1. Official</h2>
                 <div class="grid grid-cols-4 gap-1.5" id="who-group">
@@ -200,31 +187,12 @@
                 </div>
             </section>
 
-            <!-- 2. POSITION -->
             <section>
                 <div class="flex justify-between items-center mb-1">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">2. Position</h2>
-                    <button onclick="toggleFieldDisplay()" class="text-[10px] bg-blue-950 border border-blue-800 px-3 py-1 rounded-full font-bold text-blue-400">MAP FIELD</button>
-                </div>
-                <div id="fieldSection" class="hidden">
-                    <div class="field-canvas" id="soccerField" onclick="dropPin(event)">
-                        <div id="pin"></div>
-                        <div class="field-line half-line"></div>
-                        <div class="field-line center-circle"></div>
-                        <div class="field-line pen-box-l"></div>
-                        <div class="field-line pen-box-r"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. INCIDENT TYPE -->
-            <section>
-                <div class="flex justify-between items-center mb-1">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">3. Incident Type</h2>
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">2. Incident Type</h2>
                     <button onclick="clearMulti('what')" class="text-[10px] text-blue-400 font-bold uppercase tracking-wide">Clear</button>
                 </div>
 
-                <!-- LIVE FOUL COUNTER DASHBOARD CONTAINER -->
                 <div id="foul-counter-dashboard" class="mb-2 bg-slate-950 border border-slate-800 p-2 rounded-lg grid grid-cols-3 text-center font-mono text-xs items-center shadow-inner">
                     <div class="border-r border-slate-800/80">
                         <span class="text-[9px] text-slate-500 block font-bold uppercase tracking-wide">Total Fouls</span>
@@ -252,23 +220,20 @@
                     <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-[10px] text-slate-200">Mistaken ID</button>
                 </div>
 
-                <!-- Conditional Foul Team Selector -->
                 <div id="foul-team-container" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Team Committing Foul</p>
+                    <p id="foulTeamPanelTitle" class="text-[9px] font-bold text-slate-400 uppercase mb-1">Team Committing Foul</p>
                     <div class="flex gap-2" id="foul-team-group">
                         <button id="foulTeamABtn" onclick="selectFoulTeam('TeamA', this)" class="flex-1 py-3 rounded-lg font-black text-xs shadow-sm uppercase border-2 border-transparent"></button>
                         <button id="foulTeamBBtn" onclick="selectFoulTeam('TeamB', this)" class="flex-1 py-3 rounded-lg font-black text-xs shadow-sm uppercase border-2 border-transparent"></button>
                     </div>
                 </div>
 
-                <!-- Conditional Offside Selector -->
                 <div id="conditional-options" class="mt-2 hidden">
                     <button id="noFlagBtn" onclick="toggleMulti('what', 'No Flag', this)" class="w-full bg-indigo-950/60 border-2 border-indigo-800 py-3 rounded-lg font-black text-indigo-300">
                         OFFSIDE: No Flag / Stayed Down
                     </button>
                 </div>
 
-                <!-- Difficulty Selector -->
                 <div id="difficulty-options" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
                     <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Difficulty</p>
                     <div class="flex gap-1.5" id="difficulty-group">
@@ -279,7 +244,6 @@
                 </div>
             </section>
 
-            <!-- 4. EVALUATION -->
             <section>
                 <div class="flex gap-1.5" id="rating-group">
                     <button onclick="selectSingleRating('rating', 'Correct', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-green-400">CORRECT</button>
@@ -288,7 +252,6 @@
                 </div>
             </section>
 
-            <!-- 5. SAVE ACTION -->
             <section>
                 <div class="flex gap-2">
                     <input type="text" id="quickNote" placeholder="Notes..." class="flex-1 p-4 rounded-xl border border-slate-700 bg-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
@@ -297,7 +260,6 @@
             </section>
         </main>
 
-        <!-- Footer Control Row & Log Panel -->
         <div class="bg-slate-950 p-2 px-3 flex justify-between items-center border-t border-slate-800 shadow-inner">
             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Match Log History</span>
             <button onclick="exportToCSV()" class="bg-indigo-600 active:bg-indigo-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-md uppercase tracking-wide shadow-md">Export Excel (CSV)</button>
@@ -324,7 +286,7 @@
         let structuredMatchLogs = [];
         
         // Counter Storage Object
-        let counters = { totalFouls: 0, teamAFouls: 0, teamBFouls: 0 };
+        let counters = { totalFouls: 0, teamAFouls: 0, teamBFouls: 0, scoreHome: 0, scoreAway: 0 };
 
         // Dynamic Configuration Loader & Saver 
         function savePreset() {
@@ -440,26 +402,43 @@
             document.getElementById("setupScreen").classList.remove("hidden");
         }
 
-        function toggleFieldDisplay() { document.getElementById('fieldSection').classList.toggle('hidden'); }
-        
-        function dropPin(e) {
-            const field = document.getElementById('soccerField');
-            const pin = document.getElementById('pin');
-            const rect = field.getBoundingClientRect();
-            const x = Math.round((e.clientX - rect.left) / rect.width * 100);
-            const y = Math.round((e.clientY - rect.top) / rect.height * 100);
-            pin.style.left = x + '%'; pin.style.top = y + '%'; pin.style.display = 'block';
-            currentSelection.coords = `[${x}%, ${y}%]`;
-        }
-
         function handleFoulToggle(element) {
+            if (currentSelection.what.includes('Goal')) {
+                const goalBtn = Array.from(document.querySelectorAll('#what-group button')).find(b => b.textContent === 'Goal');
+                if (goalBtn) goalBtn.classList.remove('selected');
+                currentSelection.what = currentSelection.what.filter(i => i !== 'Goal');
+            }
+
             toggleMulti('what', 'Foul', element);
-            const clearFoulPanel = !currentSelection.what.includes('Foul');
-            document.getElementById('foul-team-container').classList.toggle('hidden', clearFoulPanel);
-            if (clearFoulPanel) {
+            const clearPanel = !currentSelection.what.includes('Foul');
+            
+            document.getElementById('foulTeamPanelTitle').textContent = "Team Committing Foul";
+            document.getElementById('foul-team-container').classList.toggle('hidden', clearPanel);
+            
+            if (clearPanel) {
                 currentSelection.foulTeam = null;
                 document.querySelectorAll('#foul-team-group button').forEach(b => b.style.borderColor = 'transparent');
             }
+        }
+
+        function handleGoalToggle(element) {
+            if (currentSelection.what.includes('Foul')) {
+                const foulBtn = Array.from(document.querySelectorAll('#what-group button')).find(b => b.textContent === 'Foul');
+                if (foulBtn) foulBtn.classList.remove('selected');
+                currentSelection.what = currentSelection.what.filter(i => i !== 'Foul');
+            }
+
+            toggleMulti('what', 'Goal', element);
+            const clearPanel = !currentSelection.what.includes('Goal');
+            
+            document.getElementById('foulTeamPanelTitle').textContent = "Team Scoring Goal";
+            document.getElementById('foul-team-container').classList.toggle('hidden', clearPanel);
+            
+            if (clearPanel) {
+                currentSelection.foulTeam = null;
+                document.querySelectorAll('#foul-team-group button').forEach(b => b.style.borderColor = 'transparent');
+            }
+            checkAutoCMIs();
         }
 
         function selectFoulTeam(teamKey, element) {
@@ -475,7 +454,6 @@
             document.getElementById('conditional-options').classList.toggle('hidden', !currentSelection.what.includes('Offside'));
         }
 
-        function handleGoalToggle(element) { toggleMulti('what', 'Goal', element); checkAutoCMIs(); }
         function handleCMIToggle(val, element) { toggleMulti('what', val, element); checkDifficultyVisibility(); checkAutoCMIs(); }
 
         function checkAutoCMIs() {
@@ -500,8 +478,7 @@
         function clearAllLogs() {
             document.getElementById("logList").innerHTML = "";
             structuredMatchLogs = [];
-            // Reset numerical counters
-            counters = { totalFouls: 0, teamAFouls: 0, teamBFouls: 0 };
+            counters = { totalFouls: 0, teamAFouls: 0, teamBFouls: 0, scoreHome: 0, scoreAway: 0 };
             updateCounterUI();
         }
 
@@ -509,6 +486,8 @@
             document.getElementById("foulCountTotal").textContent = counters.totalFouls;
             document.getElementById("foulCountTeamA").textContent = counters.teamAFouls;
             document.getElementById("foulCountTeamB").textContent = counters.teamBFouls;
+            document.getElementById("scoreHomeBox").textContent = counters.scoreHome;
+            document.getElementById("scoreAwayBox").textContent = counters.scoreAway;
         }
 
         function updateTimerDisplay() {
@@ -593,12 +572,13 @@
             const list = document.getElementById("logList");
             const entry = document.createElement("div");
             
-            // DYNAMIC SIDEWALL COLOR LOGIC
             let borderClass = 'border-blue-500';
             if (currentSelection.isCMI) {
                 borderClass = 'border-red-500';
             } else if (currentSelection.what.includes('Yellow')) {
                 borderClass = 'border-yellow-400';
+            } else if (currentSelection.what.includes('Goal')) {
+                borderClass = 'border-green-500';
             }
 
             entry.className = `log-entry p-2 mb-1 border-l-4 bg-slate-800 text-slate-100 shadow-sm ${borderClass}`;
@@ -606,10 +586,9 @@
             let displayItems = [];
             let source = [...currentSelection.what];
             
-            // CHECK FOR OFFSIDE BEFORE PARSING STATE
             const hasOffside = source.includes('Offside') || source.includes('No Flag');
+            const hasGoal = source.includes('Goal');
 
-            // LIVE FOUL UPDATER INCREMENT ENGINE
             if (source.includes('Foul')) { 
                 counters.totalFouls++;
                 if (currentSelection.foulTeam === config.teamAName) {
@@ -624,6 +603,21 @@
                 displayItems.push(foulLabel); 
                 source = source.filter(i => i !== 'Foul'); 
             }
+
+            if (source.includes('Goal')) {
+                if (currentSelection.foulTeam === config.teamAName) {
+                    counters.scoreHome++;
+                } else if (currentSelection.foulTeam === config.teamBName) {
+                    counters.scoreAway++;
+                }
+                updateCounterUI();
+
+                let goalLabel = 'Goal';
+                if (currentSelection.foulTeam) { goalLabel += ` (${currentSelection.foulTeam})`; }
+                displayItems.push(goalLabel);
+                source = source.filter(i => i !== 'Goal');
+            }
+
             if (source.includes('Offside')) { 
                 displayItems.push(source.includes('No Flag') ? 'Offside (Flag Down)' : 'Offside'); 
                 source = source.filter(i => i !== 'Offside' && i !== 'No Flag');
@@ -644,8 +638,8 @@
             const metricRating = currentSelection.rating || 'UNRATED';
             const noteContent = document.getElementById('quickNote').value || '';
 
-            // GENERATE FLAGS IF APPLICABLE
             const offsideIcon = hasOffside ? '<span class="ml-1.5 text-xs" title="Offside">🚩</span>' : '';
+            const goalIcon = hasGoal ? '<span class="ml-1.5 text-xs" title="Goal scored">⚽</span>' : '';
 
             structuredMatchLogs.push({
                 time: timestamp,
@@ -662,7 +656,7 @@
 
             entry.innerHTML = `
                 <div class="flex justify-between font-bold text-slate-200">
-                    <span class="flex items-center">${timestamp} | ${mappedOfficialRole} (${assignedName})${offsideIcon}</span>
+                    <span class="flex items-center">${timestamp} | ${mappedOfficialRole} (${assignedName})${offsideIcon}${goalIcon}</span>
                     <span class="text-slate-500 font-normal">${locationCoords}</span>
                 </div>
                 <div class="text-slate-300 mt-0.5">
@@ -723,7 +717,6 @@
             document.getElementById('conditional-options').classList.add('hidden');
             document.getElementById('foul-team-container').classList.add('hidden');
             document.getElementById('difficulty-options').classList.add('hidden');
-            document.getElementById('pin').style.display = 'none';
             document.getElementById('quickNote').value = "";
         }
 
