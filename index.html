@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Ref Coach Pro</title>
@@ -57,6 +57,7 @@
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             height: 100% !important; max-height: 100% !important;
             z-index: 50; background-color: #020617 !important;
+            padding-top: env(safe-area-inset-top, 24px);
         }
 
         /* SWIPE GESTURE WRAPPERS */
@@ -102,9 +103,9 @@
         #matchScreen.light-theme #rating-group button:not(.selected) { background-color: #ffffff !important; border-color: #cbd5e1 !important; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800/60 relative select-none">
+<body class="bg-slate-950 text-slate-100 flex flex-col h-dvh overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800/60 relative select-none">
 
-    <div id="setupScreen" class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 bg-gradient-to-b from-slate-900 to-slate-950 text-white">
+    <div id="setupScreen" class="flex-1 overflow-y-auto p-5 pt-[calc(env(safe-area-inset-top,24px)+20px)] flex flex-col gap-5 bg-gradient-to-b from-slate-900 to-slate-950 text-white">
         <div class="text-center py-3">
             <h1 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-500 tracking-tight uppercase">Ref Coach Pro</h1>
             <p class="text-xs text-slate-400 font-medium tracking-wide mt-1">Pre-Match Matchday Configurations</p>
@@ -170,7 +171,8 @@
         </button>
     </div>
 
-    <div id="matchScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-950">
+    <!-- ADDED SAFE AREA PADDING AND FLEX CONTAINER ADJUSTMENT HERE -->
+    <div id="matchScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-950 pt-[env(safe-area-inset-top,24px)]">
         <header class="bg-slate-900/80 backdrop-blur-md p-3 flex justify-between items-center shadow-lg gap-2 border-b border-slate-800/60 z-20">
             <button onclick="goBackToSetup()" class="bg-slate-800 border border-slate-700 text-slate-300 text-[10px] font-black uppercase px-3 py-2 rounded-xl tracking-wider shrink-0 shadow-sm">Setup</button>
             
@@ -188,7 +190,7 @@
             </div>
         </header>
 
-        <main class="overflow-y-auto p-4 flex flex-col gap-4 flex-1 pb-[180px]">
+        <main class="overflow-y-auto p-4 flex flex-col gap-4 flex-1 pb-[190px]">
             <section id="officialSection" class="premium-card bg-slate-900/40 border border-slate-900 p-3 rounded-2xl">
                 <h2 class="text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">1. Reporting Official</h2>
                 <div class="grid grid-cols-4 gap-2" id="who-group">
@@ -249,7 +251,6 @@
                 🚩 Offside: No Flag / Stayed Down
             </button>
 
-            <!-- TERMINOLOGY REVERTED TO "IMPOSSIBLE" HERE -->
             <div id="difficulty-options" class="hidden bg-slate-900/40 border border-slate-900 p-3 rounded-2xl flex-col gap-2 transition-all">
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Decision Difficulty</p>
                 <div class="flex gap-2" id="difficulty-group">
@@ -283,7 +284,8 @@
             </section>
         </main>
 
-        <div id="logHistoryContainer" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex flex-col bg-slate-900 border-t border-slate-800/80 min-h-[160px] max-h-[160px] z-30 rounded-t-2xl shadow-2xl">
+        <!-- PADDING ADDED AT BOTTOM OF WORKSPACE CONTAINER FOR GESTURE CHROMES -->
+        <div id="logHistoryContainer" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex flex-col bg-slate-900 border-t border-slate-800/80 min-h-[160px] max-h-[160px] z-30 rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,0px)]">
             <div onclick="toggleFullscreenLogs()" class="p-3 px-4 flex justify-between items-center border-b border-slate-800/60 cursor-pointer select-none active:bg-slate-800/40 transition-all rounded-t-2xl">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                     📊 Match Log History <span class="text-[9px] font-medium text-blue-400 lowercase italic tracking-normal">(tap to toggle view)</span>
