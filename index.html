@@ -11,25 +11,59 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        button { touch-action: manipulation; transition: all 0.1s ease; }
-        button:active { transform: scale(0.95); opacity: 0.8; }
-        .selected { background-color: #3b82f6 !important; color: white !important; border-color: #2563eb !important; }
-        .diff-selected { background-color: #475569 !important; color: white !important; border-color: #94a3b8 !important; }
-        .cmi-selected { background-color: #ef4444 !important; color: white !important; border-color: #dc2626 !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
 
-        /* EXPANDABLE LOG HISTORY ANIMATION & OVERLAY */
-        #logHistoryContainer { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* PREMIUM INTERACTION PHYSICS */
+        button { 
+            touch-action: manipulation; 
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        button:active { 
+            transform: scale(0.96); 
+            filter: brightness(1.15);
+        }
+
+        /* PREMIUM HIGHLIGHT STATES */
+        .selected { 
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important; 
+            color: white !important; 
+            border-color: #60a5fa !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .diff-selected { 
+            background: linear-gradient(135deg, #475569 0%, #334155 100%) !important; 
+            color: white !important; 
+            border-color: #94a3b8 !important;
+            box-shadow: 0 4px 12px rgba(71, 85, 105, 0.3);
+        }
+        .cmi-selected { 
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; 
+            color: white !important; 
+            border-color: #f87171 !important; 
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.45); 
+        }
+
+        /* EXPANDABLE LOG HISTORY CONTROLLER */
+        #logHistoryContainer { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         #logHistoryContainer.fullscreen-logs {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             height: 100% !important; max-height: 100% !important;
-            z-index: 50; background-color: #020617 !important;
+            z-index: 40; background-color: #020617 !important;
         }
 
-        /* SWIPE CONTROL ARCHITECTURE */
-        .log-row-wrapper { position: relative; overflow: hidden; margin-bottom: 4px; border-radius: 8px; }
+        /* SWIPE GESTURE WRAPPERS */
+        .log-row-wrapper { position: relative; overflow: hidden; border-radius: 12px; }
         .log-entry { 
-            position: relative; z-index: 10; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            background-color: #1e293b; border-left-width: 4px;
+            position: relative; z-index: 10; transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1); 
+            background-color: #1e293b; border-left-width: 5px;
         }
         .swipe-action-container {
             position: absolute; top: 0; bottom: 0; left: 0; right: 0;
@@ -38,260 +72,252 @@
         .swipe-action-btn {
             height: 100%; display: flex; align-items: center; justify-content: center;
             font-weight: 900; font-size: 11px; text-transform: uppercase; width: 75px; color: white;
+            letter-spacing: 0.05em;
         }
 
-        /* DYNAMIC LIGHT THEME OVERRIDES FOR SECOND SCREEN */
-        #matchScreen.light-theme { background-color: #f3f4f6 !important; color: #1f2937 !important; }
-        #matchScreen.light-theme header { background-color: #ffffff !important; color: #1f2937 !important; border-color: #e5e7eb !important; }
-        #matchScreen.light-theme header button:not(#startTimerBtn) { background-color: #f3f4f6 !important; border-color: #d1d5db !important; color: #4b5563 !important; }
-        #matchScreen.light-theme h2 { color: #4b5563 !important; }
-        
-        #matchScreen.light-theme #who-group button, 
-        #matchScreen.light-theme #what-group button:not(.bg-orange-950\/40):not(.bg-yellow-950\/40):not(.bg-red-950\/40):not(.bg-green-950\/40):not(.bg-amber-950\/40) { 
-            background-color: #ffffff !important; border-color: #d1d5db !important; color: #1f2937 !important; 
+        /* PREMIUM PREMIUM OVERLAYS & SLIDEOUTS */
+        .modal-overlay {
+            background-color: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(8px);
+            transition: opacity 0.25s ease;
         }
-        
-        #matchScreen.light-theme #what-group button.bg-orange-950\/40 { background-color: #fff7ed !important; border-color: #fed7aa !important; color: #c2410c !important; }
-        #matchScreen.light-theme #what-group button.bg-yellow-950\/40 { background-color: #fefce8 !important; border-color: #fef08a !important; color: #854d0e !important; }
-        #matchScreen.light-theme #what-group button.bg-red-950\/40 { background-color: #fef2f2 !important; border-color: #fecaca !important; color: #dc2626 !important; }
-        #matchScreen.light-theme #what-group button.bg-green-950\/40 { background-color: #f0fdf4 !important; border-color: #bbf7d0 !important; color: #16a34a !important; }
-        #matchScreen.light-theme #what-group button.bg-amber-950\/40 { background-color: #fffbeb !important; border-color: #fca5a5 !important; color: #991b1b !important; }
-        
-        #matchScreen.light-theme .selected { background-color: #2563eb !important; color: #ffffff !important; border-color: #1d4ed8 !important; }
-        #matchScreen.light-theme .cmi-selected { background-color: #dc2626 !important; color: #ffffff !important; border-color: #991b1b !important; box-shadow: 0 0 12px rgba(220, 38, 38, 0.4) !important; }
-        #matchScreen.light-theme .diff-selected { background-color: #334155 !important; color: #ffffff !important; border-color: #1e293b !important; }
 
-        #matchScreen.light-theme #foul-team-container,
-        #matchScreen.light-theme #difficulty-options { background-color: #e5e7eb !important; border-color: #d1d5db !important; }
-        #matchScreen.light-theme #foul-team-container p,
-        #matchScreen.light-theme #difficulty-options p { color: #4b5563 !important; }
-        #matchScreen.light-theme #difficulty-group button { background-color: #ffffff !important; border-color: #cbd5e1 !important; color: #334155 !important; }
-        
-        #matchScreen.light-theme #rating-group button:not(.selected):not(.cmi-selected) { background-color: #ffffff !important; border-color: #d1d5db !important; }
-        #matchScreen.light-theme #rating-group button:first-child:not(.selected) { color: #16a34a !important; }
-        #matchScreen.light-theme #rating-group button:nth-child(2):not(.selected) { color: #ea580c !important; }
-        #matchScreen.light-theme #rating-group button:nth-child(3):not(.selected) { color: #dc2626 !important; }
-
-        #matchScreen.light-theme #noFlagBtn { background-color: #e0e7ff !important; border-color: #a5b4fc !important; color: #4338ca !important; }
-        #matchScreen.light-theme #noFlagBtn.selected { background-color: #4f46e5 !important; border-color: #3730a3 !important; color: #ffffff !important; }
-
-        #matchScreen.light-theme #quickNote { background-color: #ffffff !important; border-color: #d1d5db !important; color: #1f2937 !important; }
-        
-        #matchScreen.light-theme .bg-slate-950.p-2 { background-color: #e5e7eb !important; border-color: #cbd5e1 !important; }
-        #matchScreen.light-theme .bg-slate-950.p-2 span { color: #4b5563 !important; }
-        #matchScreen.light-theme #logList { background-color: #f9fafb !important; border-color: #e5e7eb !important; }
-        
-        #matchScreen.light-theme .log-entry { background-color: #ffffff !important; color: #1f2937 !important; border-color: #cbd5e1 !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; }
-        #matchScreen.light-theme .log-entry .text-slate-200 { color: #111827 !important; }
-        #matchScreen.light-theme .log-entry .text-slate-300 { color: #374151 !important; }
-        #matchScreen.light-theme .log-entry .text-blue-400 { color: #2563eb !important; }
-        #matchScreen.light-theme .log-entry .text-slate-500 { color: #6b7280 !important; }
-        #matchScreen.light-theme .log-entry .text-red-400 { color: #dc2626 !important; }
-        #matchScreen.light-theme #logHistoryContainer.fullscreen-logs { background-color: #f3f4f6 !important; }
-
-        /* FOUL COUNTER THEME ADJUSTMENTS */
-        #matchScreen.light-theme #foul-counter-dashboard { background-color: #e5e7eb !important; border-color: #d1d5db !important; color: #1f2937 !important; }
-        #matchScreen.light-theme #foul-counter-dashboard span { color: #4b5563 !important; }
-
-        /* MATCH SCORE HEADER STYLES */
-        #matchScreen.light-theme #liveScoreboardHeader { background-color: #e5e7eb !important; border-color: #cbd5e1 !important; }
-        #matchScreen.light-theme .score-digit { background-color: #ffffff !important; color: #111827 !important; border-color: #cbd5e1 !important; }
+        /* LIGHT THEMING PRESET COMPATIBILITY */
+        #matchScreen.light-theme { background-color: #f1f5f9 !important; color: #0f172a !important; }
+        #matchScreen.light-theme header { background-color: #ffffff !important; border-color: #e2e8f0 !important; color: #0f172a !important; }
+        #matchScreen.light-theme header button:not(#startTimerBtn) { background-color: #f1f5f9 !important; border-color: #cbd5e1 !important; color: #475569 !important; }
+        #matchScreen.light-theme .premium-card { background-color: rgba(255, 255, 255, 0.8) !important; border-color: #e2e8f0 !important; }
+        #matchScreen.light-theme h2 { color: #64748b !important; }
+        #matchScreen.light-theme #who-group button,
+        #matchScreen.light-theme #what-group button:not(.bg-orange-950\/40):not(.bg-yellow-950\/40):not(.bg-red-950\/40):not(.bg-green-950\/40):not(.bg-amber-950\/40) {
+            background-color: #ffffff !important; border-color: #cbd5e1 !important; color: #334155 !important;
+        }
+        #matchScreen.light-theme #foul-counter-dashboard { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
+        #matchScreen.light-theme #foul-counter-dashboard span { color: #64748b !important; }
+        #matchScreen.light-theme #foulCountTotal { color: #0f172a !important; }
+        #matchScreen.light-theme #quickNote { background-color: #ffffff !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
+        #matchScreen.light-theme .log-entry { background-color: #ffffff !important; color: #334155 !important; border-color: #e2e8f0 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        #matchScreen.light-theme .log-entry .text-slate-200 { color: #0f172a !important; }
+        #matchScreen.light-theme .log-entry .text-slate-300 { color: #334155 !important; }
+        #matchScreen.light-theme #rating-group button:not(.selected) { background-color: #ffffff !important; border-color: #cbd5e1 !important; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans flex flex-col h-screen overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800 relative">
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800/60 relative select-none">
 
-    <div id="setupScreen" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-slate-900 text-white">
-        <div class="text-center py-1">
-            <h1 class="text-2xl font-black text-green-400 tracking-tight uppercase">Ref Coach Pro</h1>
-            <p class="text-xs text-slate-400">Pre-Match Configurations</p>
+    <div id="setupScreen" class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 bg-gradient-to-b from-slate-900 to-slate-950 text-white">
+        <div class="text-center py-3">
+            <h1 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-500 tracking-tight uppercase">Ref Coach Pro</h1>
+            <p class="text-xs text-slate-400 font-medium tracking-wide mt-1">Pre-Match Matchday Configurations</p>
         </div>
 
-        <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-3">
-            <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-1">1. Match Officials</h2>
+        <div class="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-slate-800/80 flex flex-col gap-3.5 shadow-xl">
+            <h2 class="text-xs font-black text-green-400 uppercase tracking-widest mb-1">1. Match Officials</h2>
             <div>
-                <label class="text-[11px] font-bold text-slate-400 block mb-1">Center Referee (REF)</label>
-                <input type="text" id="setupRef" value="Ref" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
+                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Center Referee (REF)</label>
+                <input type="text" id="setupRef" value="Ref" class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-green-400 transition-all">
             </div>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Assistant Ref 1 (AR1)</label>
-                    <input type="text" id="setupAR1" value="AR1" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Assistant Ref 1 (AR1)</label>
+                    <input type="text" id="setupAR1" value="AR1" class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-green-400 transition-all">
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Assistant Ref 2 (AR2)</label>
-                    <input type="text" id="setupAR2" value="AR2" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Assistant Ref 2 (AR2)</label>
+                    <input type="text" id="setupAR2" value="AR2" class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-green-400 transition-all">
                 </div>
             </div>
             <div>
-                <label class="text-[11px] font-bold text-slate-400 block mb-1">4th Official (Optional)</label>
-                <input type="text" id="setup4th" value="4th" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
+                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">4th Official (Optional)</label>
+                <input type="text" id="setup4th" value="4th" class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-green-400 transition-all">
             </div>
         </div>
 
-        <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex flex-col gap-4">
-            <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider">2. Team Configuration</h2>
-            
+        <div class="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-slate-800/80 flex flex-col gap-4 shadow-xl">
+            <h2 class="text-xs font-black text-green-400 uppercase tracking-widest">2. Team Configuration</h2>
             <div class="flex items-end gap-3">
                 <div class="flex-1">
-                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Home Team / Team A Name</label>
-                    <input type="text" id="setupTeamAName" value="Home" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Home Team Name</label>
+                    <input type="text" id="setupTeamAName" value="Home" class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-green-400 transition-all">
                 </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-400 block mb-1 text-center">Jersey</label>
-                    <input type="color" id="setupTeamAColor" value="#3b82f6" class="w-12 h-10 bg-transparent border-0 cursor-pointer block">
+                <div class="flex flex-col items-center">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Jersey</label>
+                    <input type="color" id="setupTeamAColor" value="#3b82f6" class="w-12 h-11 bg-transparent border-0 cursor-pointer block rounded-lg overflow-hidden">
                 </div>
             </div>
-
             <div class="flex items-end gap-3">
                 <div class="flex-1">
-                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Away Team / Team B Name</label>
-                    <input type="text" id="setupTeamBName" value="Away" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-white font-bold focus:outline-none focus:border-green-400">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Away Team Name</label>
+                    <input type="text" id="setupTeamBName" value="Away" class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-green-400 transition-all">
                 </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-400 block mb-1 text-center">Jersey</label>
-                    <input type="color" id="setupTeamBColor" value="#ef4444" class="w-12 h-10 bg-transparent border-0 cursor-pointer block">
+                <div class="flex flex-col items-center">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Jersey</label>
+                    <input type="color" id="setupTeamBColor" value="#ef4444" class="w-12 h-11 bg-transparent border-0 cursor-pointer block rounded-lg overflow-hidden">
                 </div>
             </div>
         </div>
 
-        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex flex-col gap-2">
-            <h2 class="text-xs font-bold text-green-400 uppercase tracking-wider">3. Configuration Memory Slots</h2>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="savePreset()" class="bg-slate-700 border border-slate-600 text-slate-200 py-2 rounded-lg font-bold text-xs uppercase hover:bg-slate-600">💾 Save Preset</button>
-                <button onclick="loadPreset()" class="bg-slate-700 border border-slate-600 text-slate-200 py-2 rounded-lg font-bold text-xs uppercase hover:bg-slate-600">📂 Load Preset</button>
+        <div class="bg-slate-900/60 backdrop-blur-md p-3.5 rounded-2xl border border-slate-800/80 flex flex-col gap-2.5 shadow-xl">
+            <h2 class="text-xs font-black text-green-400 uppercase tracking-widest">3. Memory Slots</h2>
+            <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="savePreset()" class="bg-slate-800 border border-slate-700/80 text-slate-200 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-700">💾 Save Preset</button>
+                <button onclick="loadPreset()" class="bg-slate-800 border border-slate-700/80 text-slate-200 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-slate-700">📂 Load Preset</button>
             </div>
-            <p id="presetStatus" class="text-[10px] text-slate-400 text-center italic mt-0.5">No loaded configuration data.</p>
+            <p id="presetStatus" class="text-[10px] text-slate-400 text-center italic mt-0.5">No loaded configuration profile data.</p>
         </div>
 
-        <button onclick="commitSetup()" class="w-full bg-green-500 active:bg-green-600 text-slate-950 font-black py-4 rounded-xl text-center uppercase tracking-wide text-sm shadow-lg">
+        <button onclick="commitSetup()" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 active:from-green-600 active:to-emerald-600 text-slate-950 font-black py-4 rounded-2xl text-center uppercase tracking-wider text-xs shadow-lg mt-1 shadow-green-500/10">
             Proceed to Match Dashboard &rarr;
         </button>
     </div>
 
 
-    <div id="matchScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-900">
-        <header class="bg-slate-950 text-white p-2.5 flex justify-between items-center shadow-md gap-2 border-b border-slate-800">
-            <button onclick="goBackToSetup()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] font-black uppercase px-2 py-2 rounded-lg tracking-wide shrink-0">&larr; Setup</button>
+    <div id="matchScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-950">
+        <header class="bg-slate-900/80 backdrop-blur-md p-3 flex justify-between items-center shadow-lg gap-2 border-b border-slate-800/60 z-20">
+            <button onclick="goBackToSetup()" class="bg-slate-800 border border-slate-700 text-slate-300 text-[10px] font-black uppercase px-3 py-2 rounded-xl tracking-wider shrink-0 shadow-sm">Setup</button>
             
-            <div id="timerDisplay" onclick="adjustTimer()" class="text-2xl font-mono font-bold text-green-400 cursor-pointer select-none hover:text-green-300 transition-colors shrink-0" title="Tap to adjust time">00:00</div>
+            <div id="timerDisplay" onclick="openTimerModal()" class="text-2xl font-mono font-bold text-green-400 bg-slate-950/80 px-3 py-1 rounded-xl border border-slate-800 cursor-pointer shadow-inner hover:text-green-300 transition-colors shrink-0" title="Tap to adjust time">00:00</div>
             
-            <div id="liveScoreboardHeader" class="bg-slate-900 border border-slate-800/80 px-2 py-1 rounded-lg flex items-center gap-1 font-mono font-bold text-xs shadow-inner">
-                <div id="scoreHomeBox" class="score-digit bg-slate-950 px-1.5 py-0.5 rounded text-blue-400 min-w-[16px] text-center">0</div>
-                <div class="text-slate-500 text-[10px] px-0.5">:</div>
-                <div id="scoreAwayBox" class="score-digit bg-slate-950 px-1.5 py-0.5 rounded text-red-400 min-w-[16px] text-center">0</div>
+            <div id="liveScoreboardHeader" class="bg-slate-950 border border-slate-800 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 font-mono font-bold text-xs shadow-inner shrink-0">
+                <div id="scoreHomeBox" class="score-digit bg-slate-900 border border-slate-800/80 px-2 py-0.5 rounded-md text-blue-400 min-w-[20px] text-center text-sm font-black">0</div>
+                <div class="text-slate-600 text-[10px] font-black">:</div>
+                <div id="scoreAwayBox" class="score-digit bg-slate-900 border border-slate-800/80 px-2 py-0.5 rounded-md text-red-400 min-w-[20px] text-center text-sm font-black">0</div>
             </div>
 
             <div class="flex gap-1 items-center shrink-0">
-                <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-slate-800 border border-slate-700 px-2.5 py-1.5 rounded-lg text-xs" title="Toggle Light/Dark Theme">☀️</button>
-                <button id="startTimerBtn" onclick="toggleTimer()" class="bg-green-600 px-2.5 py-1.5 rounded-lg font-bold uppercase text-[10px]">Start</button>
-                <button onclick="resetTimer()" class="bg-slate-700 px-2 py-1.5 rounded-lg text-[10px] font-bold uppercase">Reset</button>
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-slate-800 border border-slate-700 p-2 rounded-xl text-xs shadow-sm">☀️</button>
+                <button id="startTimerBtn" onclick="toggleTimer()" class="bg-gradient-to-r from-green-500 to-emerald-500 text-slate-950 px-3 py-2 rounded-xl font-black uppercase text-[10px] tracking-wider shadow-md shadow-green-500/10">Start</button>
             </div>
         </header>
 
-        <main class="overflow-y-auto p-3 flex flex-col gap-4">
-            <section id="officialSection">
-                <h2 class="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">1. Official</h2>
-                <div class="grid grid-cols-4 gap-1.5" id="who-group">
-                    <button id="btnRef" onclick="selectSingleWho('who', 'Ref', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
-                        <span class="text-[10px] uppercase text-slate-400 font-bold">REF</span>
-                        <span id="lblRefName" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
+        <main class="overflow-y-auto p-4 flex flex-col gap-4.5 flex-1 pb-44">
+            <section id="officialSection" class="premium-card bg-slate-900/40 border border-slate-900 p-3 rounded-2xl">
+                <h2 class="text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">1. Reporting Official</h2>
+                <div class="grid grid-cols-4 gap-2" id="who-group">
+                    <button id="btnRef" onclick="selectSingleWho('who', 'Ref', this)" class="bg-slate-900 border border-slate-800 py-3 rounded-xl font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                        <span class="text-[9px] uppercase text-slate-500 font-black tracking-wider">REF</span>
+                        <span id="lblRefName" class="text-xs truncate w-full px-1 text-center font-black mt-0.5">Name</span>
                     </button>
-                    <button id="btnAR1" onclick="selectSingleWho('who', 'AR1', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
-                        <span class="text-[10px] uppercase text-slate-400 font-bold">AR1</span>
-                        <span id="lblAR1Name" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
+                    <button id="btnAR1" onclick="selectSingleWho('who', 'AR1', this)" class="bg-slate-900 border border-slate-800 py-3 rounded-xl font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                        <span class="text-[9px] uppercase text-slate-500 font-black tracking-wider">AR1</span>
+                        <span id="lblAR1Name" class="text-xs truncate w-full px-1 text-center font-black mt-0.5">Name</span>
                     </button>
-                    <button id="btnAR2" onclick="selectSingleWho('who', 'AR2', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
-                        <span class="text-[10px] uppercase text-slate-400 font-bold">AR2</span>
-                        <span id="lblAR2Name" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
+                    <button id="btnAR2" onclick="selectSingleWho('who', 'AR2', this)" class="bg-slate-900 border border-slate-800 py-3 rounded-xl font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                        <span class="text-[9px] uppercase text-slate-500 font-black tracking-wider">AR2</span>
+                        <span id="lblAR2Name" class="text-xs truncate w-full px-1 text-center font-black mt-0.5">Name</span>
                     </button>
-                    <button id="btn4th" onclick="selectSingleWho('who', '4th', this)" class="bg-slate-800 border border-slate-700 py-2.5 rounded-lg font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
-                        <span class="text-[10px] uppercase text-slate-400 font-bold">4th</span>
-                        <span id="lbl4thName" class="text-xs truncate w-full px-1 text-center font-black">Name</span>
+                    <button id="btn4th" onclick="selectSingleWho('who', '4th', this)" class="bg-slate-900 border border-slate-800 py-3 rounded-xl font-bold flex flex-col items-center justify-center leading-tight text-slate-200">
+                        <span class="text-[9px] uppercase text-slate-500 font-black tracking-wider">4th</span>
+                        <span id="lbl4thName" class="text-xs truncate w-full px-1 text-center font-black mt-0.5">Name</span>
                     </button>
                 </div>
             </section>
 
-            <section>
-                <div class="flex justify-between items-center mb-1">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">2. Incident Type</h2>
-                    <button onclick="clearMulti('what')" class="text-[10px] text-blue-400 font-bold uppercase tracking-wide">Clear</button>
+            <section class="premium-card bg-slate-900/40 border border-slate-900 p-3 rounded-2xl relative">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">2. Incident Type</h2>
+                    <button onclick="clearMulti('what')" class="text-[10px] text-blue-400 font-bold uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded-md">Clear</button>
                 </div>
 
-                <div id="foul-counter-dashboard" class="mb-2 bg-slate-950 border border-slate-800 p-2 rounded-lg grid grid-cols-3 text-center font-mono text-xs items-center shadow-inner">
-                    <div class="border-r border-slate-800/80">
-                        <span class="text-[9px] text-slate-500 block font-bold uppercase tracking-wide">Total Fouls</span>
-                        <span id="foulCountTotal" class="text-base font-black text-slate-100">0</span>
+                <div id="foul-counter-dashboard" class="mb-3 bg-slate-950/80 border border-slate-900 p-2.5 rounded-xl grid grid-cols-3 text-center font-mono text-xs items-center shadow-inner">
+                    <div class="border-r border-slate-800/60">
+                        <span class="text-[9px] text-slate-500 block font-black uppercase tracking-wider">Total Fouls</span>
+                        <span id="foulCountTotal" class="text-base font-black text-slate-200">0</span>
                     </div>
-                    <div class="border-r border-slate-800/80">
-                        <span id="foulCountTeamALabel" class="text-[9px] text-blue-400 block font-bold uppercase truncate px-1">Home</span>
+                    <div class="border-r border-slate-800/60">
+                        <span id="foulCountTeamALabel" class="text-[9px] text-blue-400 block font-black uppercase tracking-wider truncate px-1">Home</span>
                         <span id="foulCountTeamA" class="text-base font-black text-blue-400">0</span>
                     </div>
                     <div>
-                        <span id="foulCountTeamBLabel" class="text-[9px] text-red-400 block font-bold uppercase truncate px-1">Away</span>
+                        <span id="foulCountTeamBLabel" class="text-[9px] text-red-400 block font-black uppercase tracking-wider truncate px-1">Away</span>
                         <span id="foulCountTeamB" class="text-base font-black text-red-400">0</span>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-1.5" id="what-group">
-                    <button onclick="handleFoulToggle(this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-slate-200">Foul</button>
-                    <button onclick="handleOffsideToggle(this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-slate-200">Offside</button>
-                    <button onclick="toggleMulti('what', 'Advantage', this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-slate-200">Adv.</button>
-                    <button onclick="handleCMIToggle('Penalty', this)" class="bg-orange-950/40 border border-orange-800 py-3 rounded-lg font-bold text-orange-400">Penalty</button>
-                    <button onclick="handleCMIToggle('Yellow', this)" class="bg-yellow-950/40 border border-yellow-700 py-3 rounded-lg font-bold text-yellow-400">Yellow</button>
-                    <button onclick="handleCMIToggle('Red', this)" class="bg-red-950/40 border border-red-800 py-3 rounded-lg font-bold text-red-400">Red Card</button>
-                    <button onclick="handleGoalToggle(this)" class="bg-green-950/40 border border-green-800 py-3 rounded-lg font-black text-green-400 text-base">⚽ Goal</button>
-                    <button onclick="handleCMIToggle('2nd Yellow', this)" class="bg-amber-950/40 border-2 border-red-800 py-3 rounded-lg font-bold text-red-400 text-[10px]">2nd Yellow</button>
-                    <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-slate-800 border border-slate-700 py-3 rounded-lg font-bold text-[10px] text-slate-200">Mistaken ID</button>
-                </div>
-
-                <div id="foul-team-container" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
-                    <p id="foulTeamPanelTitle" class="text-[9px] font-bold text-slate-400 uppercase mb-1">Team Committing Foul</p>
-                    <div class="flex gap-2" id="foul-team-group">
-                        <button id="foulTeamABtn" onclick="selectFoulTeam('TeamA', this)" class="flex-1 py-3 rounded-lg font-black text-xs shadow-sm uppercase border-2 border-transparent"></button>
-                        <button id="foulTeamBBtn" onclick="selectFoulTeam('TeamB', this)" class="flex-1 py-3 rounded-lg font-black text-xs shadow-sm uppercase border-2 border-transparent"></button>
-                    </div>
-                </div>
-
-                <div id="conditional-options" class="mt-2 hidden">
-                    <button id="noFlagBtn" onclick="toggleMulti('what', 'No Flag', this)" class="w-full bg-indigo-950/60 border-2 border-indigo-800 py-3 rounded-lg font-black text-indigo-300">
-                        OFFSIDE: No Flag / Stayed Down
-                    </button>
-                </div>
-
-                <div id="difficulty-options" class="mt-2 hidden bg-slate-800 p-2 rounded-lg border border-slate-700">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Difficulty</p>
-                    <div class="flex gap-1.5" id="difficulty-group">
-                        <button onclick="selectDifficulty('RTN', this)" class="flex-1 bg-slate-700 border border-slate-600 py-2 rounded font-bold text-xs text-slate-200">ROUTINE</button>
-                        <button onclick="selectDifficulty('DIF', this)" class="flex-1 bg-slate-700 border border-slate-600 py-2 rounded font-bold text-xs text-slate-200">DIFFICULT</button>
-                        <button onclick="selectDifficulty('IMP', this)" class="flex-1 bg-slate-700 border border-slate-600 py-2 rounded font-bold text-xs text-slate-200">IMPOSSIBLE</button>
-                    </div>
+                <div class="grid grid-cols-3 gap-2" id="what-group">
+                    <button onclick="handleFoulToggle(this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-slate-200">Foul</button>
+                    <button onclick="handleOffsideToggle(this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-slate-200">Offside</button>
+                    <button onclick="toggleMulti('what', 'Advantage', this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-slate-200">Adv.</button>
+                    <button onclick="handleCMIToggle('Penalty', this)" class="bg-orange-950/30 border border-orange-900/60 py-3.5 rounded-xl font-bold text-orange-400">Penalty</button>
+                    <button onclick="handleCMIToggle('Yellow', this)" class="bg-yellow-950/30 border border-yellow-800/60 py-3.5 rounded-xl font-bold text-yellow-400">Yellow</button>
+                    <button onclick="handleCMIToggle('Red', this)" class="bg-red-950/30 border border-red-900/60 py-3.5 rounded-xl font-bold text-red-400">Red Card</button>
+                    <button onclick="handleGoalToggle(this)" class="bg-green-950/30 border border-green-900/60 py-3.5 rounded-xl font-black text-green-400 text-sm col-span-1">⚽ Goal</button>
+                    <button onclick="handleCMIToggle('2nd Yellow', this)" class="bg-amber-950/30 border border-amber-900/60 py-3.5 rounded-xl font-bold text-amber-500 text-[10px] leading-tight">2nd Yellow</button>
+                    <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-[10px] text-slate-200 leading-tight">Mistaken ID</button>
                 </div>
             </section>
 
-            <section id="evaluationSection">
-                <div class="flex gap-1.5" id="rating-group">
-                    <button onclick="selectSingleRating('rating', 'Correct', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-green-400">CORRECT</button>
-                    <button onclick="selectSingleRating('rating', 'Incorrect', this)" class="flex-1 bg-slate-800 border border-slate-700 py-4 rounded-xl font-black text-orange-400">INCORRECT</button>
-                    <button id="cmiToggle" onclick="toggleCMI()" class="flex-1 bg-slate-800 border border-red-900/60 py-4 rounded-xl font-black text-red-400">🚨 CMI</button>
+            <button id="noFlagBtn" onclick="toggleMulti('what', 'No Flag', this)" class="w-full bg-slate-900 border border-slate-800 py-3 rounded-xl font-bold text-xs text-indigo-400 hidden uppercase tracking-wider transition-all">
+                🚩 Offside: No Flag / Stayed Down
+            </button>
+
+            <div id="difficulty-options" class="hidden bg-slate-900/40 border border-slate-900 p-3 rounded-2xl flex-col gap-2 transition-all">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Decision Difficulty</p>
+                <div class="flex gap-2" id="difficulty-group">
+                    <button onclick="selectDifficulty('RTN', this)" class="flex-1 bg-slate-950 border border-slate-800 py-2.5 rounded-lg font-bold text-[11px] text-slate-300 tracking-wider">ROUTINE</button>
+                    <button onclick="selectDifficulty('DIF', this)" class="flex-1 bg-slate-950 border border-slate-800 py-2.5 rounded-lg font-bold text-[11px] text-slate-300 tracking-wider">DIFFICULT</button>
+                    <button onclick="selectDifficulty('IMP', this)" class="flex-1 bg-slate-950 border border-slate-800 py-2.5 rounded-lg font-bold text-[11px] text-slate-300 tracking-wider">CRITICAL</button>
+                </div>
+            </div>
+
+            <section id="evaluationSection" class="premium-card bg-slate-900/40 border border-slate-900 p-1.5 rounded-2xl">
+                <div class="flex gap-2" id="rating-group">
+                    <button onclick="selectSingleRating('rating', 'Correct', this)" class="flex-1 bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-black text-xs text-green-400 uppercase tracking-wider shadow-sm">CORRECT</button>
+                    <button onclick="selectSingleRating('rating', 'Incorrect', this)" class="flex-1 bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-black text-xs text-orange-400 uppercase tracking-wider shadow-sm">INCORRECT</button>
+                    <button id="cmiToggle" onclick="toggleCMI()" class="flex-1 bg-slate-900 border border-slate-800/80 py-3.5 rounded-xl font-black text-xs text-red-400 uppercase tracking-wider shadow-sm">🚨 CMI</button>
                 </div>
             </section>
 
             <section>
                 <div class="flex gap-2">
-                    <input type="text" id="quickNote" placeholder="Notes..." class="flex-1 p-4 rounded-xl border border-slate-700 bg-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
-                    <button onclick="logEvent()" class="bg-blue-600 text-white font-black px-8 rounded-xl shadow-xl uppercase tracking-wider text-xs">Save</button>
+                    <input type="text" id="quickNote" placeholder="Enter match event notes..." class="flex-1 px-4 py-3.5 rounded-xl border border-slate-800 bg-slate-900 text-white placeholder-slate-500 text-xs font-medium focus:outline-none focus:border-blue-500/80 shadow-inner transition-all">
+                    <button onclick="logEvent()" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-black px-6 rounded-xl shadow-lg uppercase tracking-wider text-xs shadow-blue-500/10">Save</button>
                 </div>
             </section>
+
+            <div id="foul-team-container" class="hidden bg-slate-900/40 border border-slate-900 p-4 rounded-2xl flex-col gap-2 transition-all">
+                <p id="foulTeamPanelTitle" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Involved Match Team</p>
+                <div class="flex gap-3" id="foul-team-group">
+                    <button id="foulTeamABtn" onclick="selectFoulTeam('TeamA', this)" class="flex-1 py-3.5 rounded-xl font-black text-xs shadow-md uppercase border-2 border-transparent"></button>
+                    <button id="foulTeamBBtn" onclick="selectFoulTeam('TeamB', this)" class="flex-1 py-3.5 rounded-xl font-black text-xs shadow-md uppercase border-2 border-transparent"></button>
+                </div>
+            </div>
         </main>
 
-        <div id="logHistoryContainer" class="flex flex-col bg-slate-950 border-t border-slate-900 min-h-[160px] max-h-[250px]">
-            <div onclick="toggleFullscreenLogs()" class="bg-slate-950 p-2.5 px-3 flex justify-between items-center border-b border-slate-900 shadow-inner cursor-pointer select-none active:bg-slate-900">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                    🗖 Match Log History <span class="text-[9px] font-normal text-blue-400 lowercase italic">(tap header to expand)</span>
+        <div id="logHistoryContainer" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex flex-col bg-slate-900 border-t border-slate-800/80 min-h-[160px] max-h-[160px] z-30 rounded-t-2xl shadow-2xl">
+            <div onclick="toggleFullscreenLogs()" class="p-3 px-4 flex justify-between items-center border-b border-slate-800/60 cursor-pointer select-none active:bg-slate-800/40 transition-all rounded-t-2xl">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    📊 Match Log History <span class="text-[9px] font-medium text-blue-400 lowercase italic tracking-normal">(tap to expand)</span>
                 </span>
-                <button onclick="event.stopPropagation(); exportToCSV();" class="bg-indigo-600 active:bg-indigo-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-md uppercase tracking-wide shadow-md">Export Excel (CSV)</button>
+                <button onclick="event.stopPropagation(); exportToCSV();" class="bg-gradient-to-r from-indigo-500 to-blue-600 active:from-indigo-600 active:to-blue-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-xl uppercase tracking-wider shadow-md">Export CSV</button>
             </div>
-            <div class="flex-1 bg-slate-950 p-3 overflow-y-auto font-mono text-[11px]" id="logList"></div>
+            <div class="flex-1 bg-slate-950/40 p-3 overflow-y-auto font-mono text-[11px] flex flex-col gap-2" id="logList"></div>
+            <div onclick="resetTimer()" class="p-2.5 bg-slate-900 border-t border-slate-800/60 text-center text-[10px] text-red-400 font-bold uppercase tracking-widest cursor-pointer active:bg-red-950/20">Wipe and Close Match Engine</div>
+        </div>
+    </div>
+
+    <div id="timerModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-xs p-5 rounded-2xl shadow-2xl transform scale-95 transition-all duration-200">
+            <h3 class="text-xs font-black text-green-400 uppercase tracking-widest mb-3">Adjust Match Time</h3>
+            <div class="flex gap-2 items-center mb-4">
+                <input type="number" id="modalMins" placeholder="MM" class="w-1/2 bg-slate-950 border border-slate-800 rounded-xl p-3 text-center text-xl font-mono text-white font-bold focus:outline-none focus:border-green-400">
+                <span class="text-xl font-mono text-slate-500 font-bold">:</span>
+                <input type="number" id="modalSecs" placeholder="SS" class="w-1/2 bg-slate-950 border border-slate-800 rounded-xl p-3 text-center text-xl font-mono text-white font-bold focus:outline-none focus:border-green-400">
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeTimerModal()" class="flex-1 bg-slate-800 text-slate-400 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">Cancel</button>
+                <button onclick="saveTimerModal()" class="flex-1 bg-green-500 text-slate-950 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editNoteModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm p-5 rounded-2xl shadow-2xl transform scale-95 transition-all duration-200">
+            <h3 class="text-xs font-black text-blue-400 uppercase tracking-widest mb-2">Edit Event Log Note</h3>
+            <textarea id="modalNoteText" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 resize-none mb-4 font-sans font-medium"></textarea>
+            <div class="flex gap-2">
+                <button onclick="closeEditNoteModal()" class="flex-1 bg-slate-800 text-slate-400 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">Cancel</button>
+                <button onclick="saveEditNoteModal()" class="flex-1 bg-blue-500 text-white py-2.5 rounded-xl text-xs font-black uppercase tracking-wider">Update</button>
+            </div>
         </div>
     </div>
 
@@ -299,7 +325,7 @@
         if ('serviceWorker' in navigator) {
             const swCode = `self.addEventListener('fetch', function(e) { e.respondWith(fetch(e.request)); });`;
             const blob = new Blob([swCode], {type: 'text/javascript'});
-            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log("Local PWA Warning skipped."));
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log("Local PWA active."));
         }
 
         // Configuration State Store
@@ -312,9 +338,8 @@
         let currentSelection = { who: null, what: [], foulTeam: null, rating: null, isCMI: false, coords: null, difficulty: null };
         let timerInterval, seconds = 0, isRunning = false;
         let structuredMatchLogs = [];
-        
-        // Counter Storage Object
         let counters = { totalFouls: 0, teamAFouls: 0, teamBFouls: 0, scoreHome: 0, scoreAway: 0 };
+        let editingLogIdTarget = null;
 
         function toggleFullscreenLogs() {
             const container = document.getElementById("logHistoryContainer");
@@ -338,10 +363,7 @@
 
         function loadPreset() {
             const stored = localStorage.getItem("refCoachPreset");
-            if (!stored) {
-                alert("No pre-loaded profile data configurations found. Fill the form out and press 'Save Preset' first.");
-                return;
-            }
+            if (!stored) return;
             const parsed = JSON.parse(stored);
             
             config.refName = parsed.refName || "Ref";
@@ -397,29 +419,23 @@
             config.teamBName = document.getElementById("setupTeamBName").value.trim() || "Away";
             config.teamBColor = document.getElementById("setupTeamBColor").value;
 
-            if(document.getElementById("lblRefName")) document.getElementById("lblRefName").textContent = config.refName;
-            if(document.getElementById("lblAR1Name")) document.getElementById("lblAR1Name").textContent = config.ar1Name;
-            if(document.getElementById("lblAR2Name")) document.getElementById("lblAR2Name").textContent = config.ar2Name;
-            if(document.getElementById("lbl4thName")) document.getElementById("lbl4thName").textContent = config.fourthName;
+            document.getElementById("lblRefName").textContent = config.refName;
+            document.getElementById("lblAR1Name").textContent = config.ar1Name;
+            document.getElementById("lblAR2Name").textContent = config.ar2Name;
+            document.getElementById("lbl4thName").textContent = config.fourthName;
 
             document.getElementById("foulCountTeamALabel").textContent = config.teamAName;
             document.getElementById("foulCountTeamBLabel").textContent = config.teamBName;
 
             const btnFoulA = document.getElementById("foulTeamABtn");
-            if(btnFoulA) {
-                btnFoulA.textContent = config.teamAName;
-                btnFoulA.style.backgroundColor = config.teamAColor;
-                btnFoulA.style.borderColor = "transparent";
-                btnFoulA.style.color = getContrastColor(config.teamAColor);
-            }
+            btnFoulA.textContent = config.teamAName;
+            btnFoulA.style.backgroundColor = config.teamAColor;
+            btnFoulA.style.color = getContrastColor(config.teamAColor);
 
             const btnFoulB = document.getElementById("foulTeamBBtn");
-            if(btnFoulB) {
-                btnFoulB.textContent = config.teamBName;
-                btnFoulB.style.backgroundColor = config.teamBColor;
-                btnFoulB.style.borderColor = "transparent";
-                btnFoulB.style.color = getContrastColor(config.teamBColor);
-            }
+            btnFoulB.textContent = config.teamBName;
+            btnFoulB.style.backgroundColor = config.teamBColor;
+            btnFoulB.style.color = getContrastColor(config.teamBColor);
 
             document.getElementById("setupScreen").classList.add("hidden");
             document.getElementById("matchScreen").classList.remove("hidden");
@@ -428,6 +444,18 @@
         function goBackToSetup() {
             document.getElementById("matchScreen").classList.add("hidden");
             document.getElementById("setupScreen").classList.remove("hidden");
+        }
+
+        // CONTROL VISIBILITY CONVERTED FROM SLIDEOUT OVERLAYS TO INLINE FLOW BLOCKS
+        function animateSlidePanel(id, show) {
+            const panel = document.getElementById(id);
+            if(show) {
+                panel.classList.remove('hidden');
+                panel.classList.add('flex');
+            } else {
+                panel.classList.remove('flex');
+                panel.classList.add('hidden');
+            }
         }
 
         function handleFoulToggle(element) {
@@ -441,8 +469,7 @@
             const isFoulActive = currentSelection.what.includes('Foul');
             
             document.getElementById('foulTeamPanelTitle').textContent = "Team Committing Foul";
-            document.getElementById('foul-team-container').classList.toggle('hidden', !isFoulActive);
-            
+            animateSlidePanel('foul-team-container', isFoulActive);
             evaluateFoulSectionVisibility();
 
             if (!isFoulActive) {
@@ -462,8 +489,7 @@
             const isGoalActive = currentSelection.what.includes('Goal');
             
             document.getElementById('foulTeamPanelTitle').textContent = "Team Scoring Goal";
-            document.getElementById('foul-team-container').classList.toggle('hidden', !isGoalActive);
-            
+            animateSlidePanel('foul-team-container', isGoalActive);
             showOfficialAndEvaluationSections(!isGoalActive);
 
             if (!isGoalActive) {
@@ -476,14 +502,7 @@
         function evaluateFoulSectionVisibility() {
             const whatList = currentSelection.what;
             const isFoul = whatList.includes('Foul');
-            
-            if (isFoul && whatList.length === 1) {
-                showOfficialAndEvaluationSections(false);
-            } else if (whatList.includes('Goal')) {
-                showOfficialAndEvaluationSections(false);
-            } else {
-                showOfficialAndEvaluationSections(true);
-            }
+            showOfficialAndEvaluationSections(!(isFoul && whatList.length === 1 || whatList.includes('Goal')));
         }
 
         function showOfficialAndEvaluationSections(show) {
@@ -503,7 +522,13 @@
             checkDifficultyVisibility();
             checkAutoCMIs();
             evaluateFoulSectionVisibility();
-            document.getElementById('conditional-options').classList.toggle('hidden', !currentSelection.what.includes('Offside'));
+            
+            const noFlag = document.getElementById('noFlagBtn');
+            if(currentSelection.what.includes('Offside')) {
+                noFlag.classList.remove('hidden');
+            } else {
+                noFlag.classList.add('hidden');
+            }
         }
 
         function handleCMIToggle(val, element) { 
@@ -523,7 +548,15 @@
 
         function checkDifficultyVisibility() {
             const hasTrigger = currentSelection.what.some(i => ['Penalty', 'Offside', 'Yellow', 'Red', '2nd Yellow'].includes(i));
-            document.getElementById('difficulty-options').classList.toggle('hidden', !hasTrigger);
+            const diffOptions = document.getElementById('difficulty-options');
+            
+            if(hasTrigger) {
+                diffOptions.classList.remove('hidden');
+                diffOptions.classList.add('flex');
+            } else {
+                diffOptions.classList.remove('flex');
+                diffOptions.classList.add('hidden');
+            }
         }
 
         function selectDifficulty(val, element) {
@@ -560,33 +593,34 @@
                 btn.textContent = "Resume"; 
                 isRunning = false;
             } else {
-                timerInterval = setInterval(() => {
-                    seconds++;
-                    updateTimerDisplay();
-                }, 1000);
+                timerInterval = setInterval(() => { seconds++; updateTimerDisplay(); }, 1000);
                 btn.textContent = "Pause";
                 isRunning = true;
             }
         }
 
-        function adjustTimer() {
-            let wasRunning = isRunning;
-            if (isRunning) { toggleTimer(); }
-            let currentTimeStr = document.getElementById("timerDisplay").textContent;
-            let newTime = prompt("Set match time (MM:SS or raw minutes):", currentTimeStr);
-            
-            if (newTime !== null && newTime.trim() !== "") {
-                let parts = newTime.split(":");
-                let newSeconds = 0;
-                if (parts.length === 2) {
-                    newSeconds = (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0);
-                } else if (parts.length === 1) {
-                    newSeconds = (parseInt(parts[0], 10) || 0) * 60;
-                }
-                seconds = newSeconds;
-                updateTimerDisplay();
-            }
-            if (wasRunning) { toggleTimer(); }
+        // PREMIUM MODAL ANIMATION UTILITIES
+        function openTimerModal() {
+            if (isRunning) toggleTimer();
+            document.getElementById('modalMins').value = Math.floor(seconds / 60);
+            document.getElementById('modalSecs').value = seconds % 60;
+            const modal = document.getElementById('timerModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.remove('scale-95');
+        }
+
+        function closeTimerModal() {
+            const modal = document.getElementById('timerModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.add('scale-95');
+        }
+
+        function saveTimerModal() {
+            const m = parseInt(document.getElementById('modalMins').value, 10) || 0;
+            const s = parseInt(document.getElementById('modalSecs').value, 10) || 0;
+            seconds = (m * 60) + s;
+            updateTimerDisplay();
+            closeTimerModal();
         }
 
         function selectSingleRating(cat, val, el) {
@@ -614,11 +648,11 @@
         function clearMulti(cat) {
             currentSelection[cat] = [];
             document.querySelectorAll(`#${cat}-group button`).forEach(b => b.classList.remove('selected', 'cmi-selected'));
-            document.getElementById('conditional-options').classList.add('hidden');
-            document.getElementById('foul-team-container').classList.add('hidden');
+            document.getElementById('noFlagBtn').classList.add('hidden');
+            animateSlidePanel('foul-team-container', false);
+            document.getElementById('difficulty-options').classList.add('hidden');
             currentSelection.foulTeam = null;
             showOfficialAndEvaluationSections(true);
-            checkDifficultyVisibility();
         }
 
         function toggleCMI() {
@@ -626,20 +660,15 @@
             document.getElementById("cmiToggle").classList.toggle('cmi-selected', currentSelection.isCMI);
         }
 
-        // SWIPE INTERACTION LOGIC ARCHITECTURE
+        // SWIPE SYSTEM ENGINE
         let activeOpenRowId = null;
 
         function attachSwipeGestures(rowWrapper, logId) {
             let entryNode = rowWrapper.querySelector('.log-entry');
-            let startX = 0;
-            let currentX = 0;
-            let isSwiping = false;
+            let startX = 0, currentX = 0, isSwiping = false;
 
             entryNode.addEventListener('touchstart', (e) => {
-                // If another item is open, slide it closed
-                if (activeOpenRowId && activeOpenRowId !== logId) {
-                    closeActiveSwipeRow();
-                }
+                if (activeOpenRowId && activeOpenRowId !== logId) closeActiveSwipeRow();
                 startX = e.touches[0].clientX;
                 isSwiping = true;
             }, { passive: true });
@@ -648,28 +677,21 @@
                 if (!isSwiping) return;
                 currentX = e.touches[0].clientX;
                 let diff = currentX - startX;
-
-                // Restrict extreme limits
                 if (diff > 85) diff = 85;
                 if (diff < -85) diff = -85;
-
                 entryNode.style.transform = `translateX(${diff}px)`;
             }, { passive: true });
 
-            entryNode.addEventListener('touchend', (e) => {
+            entryNode.addEventListener('touchend', () => {
                 isSwiping = false;
                 let diff = currentX - startX;
-
-                if (diff < -40) {
-                    // Snap open Left (reveals Delete on right side)
+                if (diff < -35) {
                     entryNode.style.transform = 'translateX(-75px)';
                     activeOpenRowId = logId;
-                } else if (diff > 40) {
-                    // Snap open Right (reveals Edit on left side)
+                } else if (diff > 35) {
                     entryNode.style.transform = 'translateX(75px)';
                     activeOpenRowId = logId;
                 } else {
-                    // Snap shut
                     entryNode.style.transform = 'translateX(0px)';
                     if (activeOpenRowId === logId) activeOpenRowId = null;
                 }
@@ -686,31 +708,22 @@
             activeOpenRowId = null;
         }
 
-        // Document global tap detector to close open swipe containers instantly
         document.addEventListener('touchstart', (e) => {
-            if (!e.target.closest('.log-row-wrapper')) {
-                closeActiveSwipeRow();
-            }
+            if (!e.target.closest('.log-row-wrapper')) closeActiveSwipeRow();
         }, { passive: true });
 
         function deleteLogEntry(logId, eventType, infractingTeam) {
             event.stopPropagation();
-            
-            // Adjust Counters Backwards Downwards based on deleted content type
             if (eventType === 'Goal') {
-                if (infractingTeam === config.teamAName) { counters.scoreHome = Math.max(0, counters.scoreHome - 1); }
-                else if (infractingTeam === config.teamBName) { counters.scoreAway = Math.max(0, counters.scoreAway - 1); }
+                if (infractingTeam === config.teamAName) counters.scoreHome = Math.max(0, counters.scoreHome - 1);
+                else if (infractingTeam === config.teamBName) counters.scoreAway = Math.max(0, counters.scoreAway - 1);
             } else if (eventType === 'Foul' || eventType.includes('Foul')) {
                 counters.totalFouls = Math.max(0, counters.totalFouls - 1);
-                if (infractingTeam === config.teamAName) { counters.teamAFouls = Math.max(0, counters.teamAFouls - 1); }
-                else if (infractingTeam === config.teamBName) { counters.teamBFouls = Math.max(0, counters.teamBFouls - 1); }
+                if (infractingTeam === config.teamAName) counters.teamAFouls = Math.max(0, counters.teamAFouls - 1);
+                else if (infractingTeam === config.teamBName) counters.teamBFouls = Math.max(0, counters.teamBFouls - 1);
             }
-
             updateCounterUI();
-            
-            // Remove from items registries
             structuredMatchLogs = structuredMatchLogs.filter(item => item.id !== logId);
-            
             let targetRow = document.getElementById(`row-${logId}`);
             if (targetRow) targetRow.remove();
             activeOpenRowId = null;
@@ -721,23 +734,39 @@
             let matchedRecord = structuredMatchLogs.find(item => item.id === logId);
             if (!matchedRecord) return;
 
-            let revisedNote = prompt("Edit Note text description content:", matchedRecord.notes);
-            if (revisedNote !== null) {
-                matchedRecord.notes = revisedNote.trim();
-                
-                // Refresh local element rendering item block view data directly
-                let noteElementBox = document.getElementById(`note-box-${logId}`);
+            editingLogIdTarget = logId;
+            document.getElementById('modalNoteText').value = matchedRecord.notes;
+            
+            const modal = document.getElementById('editNoteModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.remove('scale-95');
+            closeActiveSwipeRow();
+        }
+
+        function closeEditNoteModal() {
+            const modal = document.getElementById('editNoteModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.add('scale-95');
+            editingLogIdTarget = null;
+        }
+
+        function saveEditNoteModal() {
+            if (!editingLogIdTarget) return;
+            let matchedRecord = structuredMatchLogs.find(item => item.id === editingLogIdTarget);
+            if (matchedRecord) {
+                matchedRecord.notes = document.getElementById('modalNoteText').value.trim();
+                let noteElementBox = document.getElementById(`note-box-${editingLogIdTarget}`);
                 if (noteElementBox) {
                     if (matchedRecord.notes) {
                         noteElementBox.innerHTML = `"${matchedRecord.notes}"`;
-                        noteElementBox.className = "text-slate-400 italic mt-0.5 text-[10px]";
+                        noteElementBox.className = "text-slate-400 italic mt-1 text-[10px]";
                     } else {
                         noteElementBox.innerHTML = "";
                         noteElementBox.className = "";
                     }
                 }
             }
-            closeActiveSwipeRow();
+            closeEditNoteModal();
         }
 
         function logEvent() {
@@ -746,7 +775,6 @@
             const noteContent = document.getElementById('quickNote').value || '';
             const uniqueLogId = Date.now();
             
-            let borderClass = 'border-blue-500';
             let source = [...currentSelection.what];
             const hasGoal = source.includes('Goal');
             const hasFoul = source.includes('Foul');
@@ -754,33 +782,31 @@
 
             const rowWrapper = document.createElement("div");
             rowWrapper.id = `row-${uniqueLogId}`;
-            rowWrapper.className = "log-row-wrapper";
+            rowWrapper.className = "log-row-wrapper shadow-sm";
 
-            // Add background actions elements
             rowWrapper.innerHTML = `
                 <div class="swipe-action-container">
-                    <div onclick="editLogEntryNote(${uniqueLogId})" class="swipe-action-btn bg-blue-600 rounded-l-lg">Edit</div>
-                    <div onclick="deleteLogEntry(${uniqueLogId}, '${hasGoal ? 'Goal' : (hasFoul ? 'Foul' : 'Misc')}', '${targetTeam}')" class="swipe-action-btn bg-red-600 rounded-r-lg">Delete</div>
+                    <div onclick="editLogEntryNote(${uniqueLogId})" class="swipe-action-btn bg-blue-600 rounded-l-xl">Edit</div>
+                    <div onclick="deleteLogEntry(${uniqueLogId}, '${hasGoal ? 'Goal' : (hasFoul ? 'Foul' : 'Misc')}', '${targetTeam}')" class="swipe-action-btn bg-red-600 rounded-r-xl">Delete</div>
                 </div>
-                <div class="log-entry p-2.5 shadow-sm text-slate-100"></div>
+                <div class="log-entry p-3 text-slate-100 border-l-4"></div>
             `;
             
             const entry = rowWrapper.querySelector('.log-entry');
 
-            // --- GOAL LAYOUT SPECIFIC TRACKING ---
             if (hasGoal) {
-                if (currentSelection.foulTeam === config.teamAName) { counters.scoreHome++; } 
-                else if (currentSelection.foulTeam === config.teamBName) { counters.scoreAway++; }
+                if (currentSelection.foulTeam === config.teamAName) counters.scoreHome++; 
+                else if (currentSelection.foulTeam === config.teamBName) counters.scoreAway++;
                 updateCounterUI();
 
                 const currentScoreString = `${counters.scoreHome} - ${counters.scoreAway}`;
-                entry.className += ' border-green-500';
+                entry.style.borderColor = "#10b981";
                 entry.innerHTML = `
-                    <div class="flex justify-between font-bold text-slate-200">
-                        <span class="flex items-center text-green-400 font-black">${timestamp} | Goal (${targetTeam}) ⚽</span>
-                        <span class="text-slate-400 font-mono">Score: ${currentScoreString}</span>
+                    <div class="flex justify-between font-bold text-slate-200 items-center">
+                        <span class="flex items-center text-green-400 font-black tracking-wide">${timestamp} | Goal (${targetTeam}) ⚽</span>
+                        <span class="text-slate-400 font-mono text-xs bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${currentScoreString}</span>
                     </div>
-                    <div id="note-box-${uniqueLogId}" class="${noteContent ? 'text-slate-400 italic mt-0.5 text-[10px]' : ''}">${noteContent ? `"${noteContent}"` : ''}</div>
+                    <div id="note-box-${uniqueLogId}" class="${noteContent ? 'text-slate-400 italic mt-1 text-[10px]' : ''}">${noteContent ? `"${noteContent}"` : ''}</div>
                 `;
 
                 structuredMatchLogs.push({
@@ -795,20 +821,18 @@
                 return;
             }
 
-            // --- ROUTINE STANDALONE FOUL TRACKING ---
             if (hasFoul && source.length === 1) {
                 counters.totalFouls++;
-                if (currentSelection.foulTeam === config.teamAName) { counters.teamAFouls++; } 
-                else if (currentSelection.foulTeam === config.teamBName) { counters.teamBFouls++; }
+                if (currentSelection.foulTeam === config.teamAName) counters.teamAFouls++; 
+                else if (currentSelection.foulTeam === config.teamBName) counters.teamBFouls++;
                 updateCounterUI();
 
-                entry.className += ' border-slate-500';
+                entry.style.borderColor = "#64748b";
                 entry.innerHTML = `
                     <div class="flex justify-between font-bold text-slate-200">
-                        <span class="text-slate-200 font-black">${timestamp} | Foul (${targetTeam})</span>
-                        <span></span>
+                        <span class="text-slate-300 font-black tracking-wide">${timestamp} | Foul (${targetTeam})</span>
                     </div>
-                    <div id="note-box-${uniqueLogId}" class="${noteContent ? 'text-slate-400 italic mt-0.5 text-[10px]' : ''}">${noteContent ? `"${noteContent}"` : ''}</div>
+                    <div id="note-box-${uniqueLogId}" class="${noteContent ? 'text-slate-400 italic mt-1 text-[10px]' : ''}">${noteContent ? `"${noteContent}"` : ''}</div>
                 `;
 
                 structuredMatchLogs.push({
@@ -823,27 +847,19 @@
                 return;
             }
 
-            // --- COMPLEX INCIDENTS CODING ENGINE (CARDS, PENALTIES, OFFSIDES) ---
-            if (currentSelection.isCMI) {
-                entry.className += ' border-red-500';
-            } else if (source.includes('Yellow')) {
-                entry.className += ' border-yellow-400';
-            } else {
-                entry.className += ' border-blue-500';
-            }
+            if (currentSelection.isCMI) entry.style.borderColor = "#ef4444";
+            else if (source.includes('Yellow')) entry.style.borderColor = "#eab308";
+            else entry.style.borderColor = "#3b82f6";
 
             let displayItems = [];
             const hasOffside = source.includes('Offside') || source.includes('No Flag');
 
             if (source.includes('Foul')) { 
                 counters.totalFouls++;
-                if (currentSelection.foulTeam === config.teamAName) { counters.teamAFouls++; } 
-                else if (currentSelection.foulTeam === config.teamBName) { counters.teamBFouls++; }
+                if (currentSelection.foulTeam === config.teamAName) counters.teamAFouls++; 
+                else if (currentSelection.foulTeam === config.teamBName) counters.teamBFouls++;
                 updateCounterUI();
-
-                let foulLabel = 'Foul';
-                if (currentSelection.foulTeam) { foulLabel += ` (${currentSelection.foulTeam})`; }
-                displayItems.push(foulLabel); 
+                displayItems.push(`Foul (${targetTeam})`); 
                 source = source.filter(i => i !== 'Foul'); 
             }
 
@@ -853,33 +869,30 @@
             }
             displayItems = displayItems.concat(source);
 
-            let mappedOfficialRole = 'REF';
-            let assignedName = config.refName;
-            if (currentSelection.who === 'AR1') { mappedOfficialRole = 'AR1'; assignedName = config.ar1Name; }
-            if (currentSelection.who === 'AR2') { mappedOfficialRole = 'AR2'; assignedName = config.ar2Name; }
-            if (currentSelection.who === '4th') { mappedOfficialRole = '4th'; assignedName = config.fourthName; }
+            let role = 'REF', assignedName = config.refName;
+            if (currentSelection.who === 'AR1') { role = 'AR1'; assignedName = config.ar1Name; }
+            if (currentSelection.who === 'AR2') { role = 'AR2'; assignedName = config.ar2Name; }
+            if (currentSelection.who === '4th') { role = '4th'; assignedName = config.fourthName; }
 
             const compoundIncidents = displayItems.join(" + ");
             const metricDiff = currentSelection.difficulty || 'NA';
             const metricRating = currentSelection.rating || 'UNRATED';
-            const offsideIcon = hasOffside ? '<span class="ml-1.5 text-xs" title="Offside">🚩</span>' : '';
 
             structuredMatchLogs.push({
-                id: uniqueLogId, time: timestamp, officialRole: mappedOfficialRole, officialName: assignedName, coords: '',
+                id: uniqueLogId, time: timestamp, officialRole: role, officialName: assignedName, coords: '',
                 incidents: compoundIncidents, teamInvolved: currentSelection.foulTeam || 'N/A',
                 difficulty: metricDiff, evaluation: metricRating, cmi: currentSelection.isCMI ? 'YES' : 'NO', notes: noteContent
             });
 
             entry.innerHTML = `
                 <div class="flex justify-between font-bold text-slate-200">
-                    <span class="flex items-center">${timestamp} | ${mappedOfficialRole} (${assignedName})${offsideIcon}</span>
-                    <span class="text-slate-500 font-normal"></span>
+                    <span class="tracking-wide">${timestamp} | ${role} (${assignedName}) ${hasOffside ? '🚩' : ''}</span>
                 </div>
-                <div class="text-slate-300 mt-0.5">
-                    ${compoundIncidents} [${metricDiff}] — <span class="italic font-bold text-blue-400">${metricRating}</span> 
-                    ${currentSelection.isCMI ? '<b class="text-red-400 ml-1">[CMI]</b>' : ''}
+                <div class="text-slate-300 mt-1 font-sans text-xs">
+                    ${compoundIncidents} [${metricDiff}] &mdash; <span class="italic font-black text-blue-400">${metricRating}</span> 
+                    ${currentSelection.isCMI ? '<b class="text-red-400 ml-1 bg-red-500/10 px-1 rounded">[CMI]</b>' : ''}
                 </div>
-                <div id="note-box-${uniqueLogId}" class="${noteContent ? 'text-slate-400 italic mt-0.5 text-[10px]' : ''}">${noteContent ? `"${noteContent}"` : ''}</div>
+                <div id="note-box-${uniqueLogId}" class="${noteContent ? 'text-slate-400 italic mt-1 text-[10px]' : ''}">${noteContent ? `"${noteContent}"` : ''}</div>
             `;
             
             list.insertBefore(rowWrapper, list.firstChild);
@@ -888,36 +901,21 @@
         }
 
         function exportToCSV() {
-            if (structuredMatchLogs.length === 0) {
-                alert("There are no logging events recorded yet to export.");
-                return;
-            }
-            
+            if (structuredMatchLogs.length === 0) return;
             const forceText = (str) => {
                 if (!str) return '""';
-                let escaped = String(str).replace(/"/g, '""');
-                return `"=""${escaped}"""`;
+                return `"=""${String(str).replace(/"/g, '""')}"""`;
             };
-
             const csvHeaders = "Match Time,Official Position,Official Name,Field Coordinates,Incident Details,Infracting Team,Difficulty Tier,Evaluation,CMI Flag,Notes\n";
-            
             const csvRows = structuredMatchLogs.map(item => {
                 return [
-                    forceText(item.time),
-                    forceText(item.officialRole),
-                    forceText(item.officialName),
-                    forceText(item.coords),
-                    forceText(item.incidents),
-                    forceText(item.teamInvolved),
-                    forceText(item.difficulty),
-                    forceText(item.evaluation),
-                    forceText(item.cmi),
-                    forceText(item.notes)
+                    forceText(item.time), forceText(item.officialRole), forceText(item.officialName), forceText(item.coords),
+                    forceText(item.incidents), forceText(item.teamInvolved), forceText(item.difficulty), forceText(item.evaluation),
+                    forceText(item.cmi), forceText(item.notes)
                 ].join(",");
             }).join("\n");
 
-            const finalCsvString = csvHeaders + csvRows;
-            const blob = new Blob([finalCsvString], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([csvHeaders + csvRows], { type: 'text/csv;charset=utf-8;' });
             const blobUrl = URL.createObjectURL(blob);
             const downloadLink = document.createElement("a");
             downloadLink.setAttribute("href", blobUrl);
@@ -932,7 +930,7 @@
             currentSelection = { who: null, what: [], foulTeam: null, rating: null, isCMI: false, coords: null, difficulty: null };
             document.querySelectorAll('.selected, .cmi-selected, .diff-selected').forEach(el => el.classList.remove('selected', 'cmi-selected', 'diff-selected'));
             document.querySelectorAll('#foul-team-group button').forEach(b => b.style.borderColor = 'transparent');
-            document.getElementById('conditional-options').classList.add('hidden');
+            document.getElementById('noFlagBtn').classList.add('hidden');
             document.getElementById('foul-team-container').classList.add('hidden');
             document.getElementById('difficulty-options').classList.add('hidden');
             document.getElementById('quickNote').value = "";
@@ -942,8 +940,7 @@
         function resetTimer() { 
             if(confirm("Wipe everything and return to Setup Screen?")) { 
                 clearInterval(timerInterval); 
-                seconds = 0; 
-                isRunning = false; 
+                seconds = 0; isRunning = false; 
                 updateTimerDisplay(); 
                 document.getElementById("startTimerBtn").textContent = "Start";
                 clearAllLogs();
