@@ -106,9 +106,18 @@
 <body class="bg-slate-950 text-slate-100 flex flex-col h-dvh overflow-hidden text-sm max-w-md mx-auto shadow-2xl border-x border-slate-800/60 relative select-none">
 
     <div id="setupScreen" class="flex-1 overflow-y-auto p-5 pt-[calc(env(safe-area-inset-top,24px)+20px)] flex flex-col gap-5 bg-gradient-to-b from-slate-900 to-slate-950 text-white">
-        <div class="text-center py-3">
+        <div class="text-center py-2 flex flex-col items-center">
             <h1 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-500 tracking-tight uppercase">Ref Coach Pro</h1>
-            <p class="text-xs text-slate-400 font-medium tracking-wide mt-1">Pre-Match Matchday Configurations</p>
+            <p class="text-xs text-slate-400 font-medium tracking-wide mt-0.5">Pre-Match Matchday Configurations</p>
+            
+            <div class="mt-4 bg-slate-900/90 border border-slate-800/80 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-inner">
+                <div class="text-left">
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest block">Lifetime Matches</span>
+                    <span id="matchCounterDisplay" class="text-lg font-mono font-black text-green-400">0</span>
+                </div>
+                <div class="h-6 w-[1px] bg-slate-800"></div>
+                <button onclick="promptSetMatchCounter()" class="text-[10px] font-bold text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 active:bg-blue-500/20">Set / Reset</button>
+            </div>
         </div>
 
         <div class="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-slate-800/80 flex flex-col gap-3.5 shadow-xl">
@@ -171,7 +180,6 @@
         </button>
     </div>
 
-    <!-- ADDED SAFE AREA PADDING AND FLEX CONTAINER ADJUSTMENT HERE -->
     <div id="matchScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-950 pt-[env(safe-area-inset-top,24px)]">
         <header class="bg-slate-900/80 backdrop-blur-md p-3 flex justify-between items-center shadow-lg gap-2 border-b border-slate-800/60 z-20">
             <button onclick="goBackToSetup()" class="bg-slate-800 border border-slate-700 text-slate-300 text-[10px] font-black uppercase px-3 py-2 rounded-xl tracking-wider shrink-0 shadow-sm">Setup</button>
@@ -284,7 +292,6 @@
             </section>
         </main>
 
-        <!-- PADDING ADDED AT BOTTOM OF WORKSPACE CONTAINER FOR GESTURE CHROMES -->
         <div id="logHistoryContainer" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex flex-col bg-slate-900 border-t border-slate-800/80 min-h-[160px] max-h-[160px] z-30 rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,0px)]">
             <div onclick="toggleFullscreenLogs()" class="p-3 px-4 flex justify-between items-center border-b border-slate-800/60 cursor-pointer select-none active:bg-slate-800/40 transition-all rounded-t-2xl">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -341,6 +348,42 @@
         let structuredMatchLogs = [];
         let counters = { totalFouls: 0, teamAFouls: 0, teamBFouls: 0, scoreHome: 0, scoreAway: 0 };
         let editingLogIdTarget = null;
+        let isMatchSessionActive = false; 
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem("refCoachPreset")) {
+                document.getElementById("presetStatus").textContent = "Saved configuration profile is available to load.";
+            }
+            updateMatchCounterUI();
+        });
+
+        function updateMatchCounterUI() {
+            let totalMatches = parseInt(localStorage.getItem("refCoachTotalMatches")) || 0;
+            document.getElementById("matchCounterDisplay").textContent = totalMatches;
+        }
+
+        function promptSetMatchCounter() {
+            let currentCount = localStorage.getItem("refCoachTotalMatches") || 0;
+            let val = prompt("Set or Reset the match counter tally to any number:", currentCount);
+            if (val !== null) {
+                let cleanNum = parseInt(val, 10);
+                if (!isNaN(cleanNum) && cleanNum >= 0) {
+                    localStorage.setItem("refCoachTotalMatches", cleanNum);
+                    updateMatchCounterUI();
+                } else {
+                    alert("Please insert a valid, positive whole number.");
+                }
+            }
+        }
+
+        function incrementMatchCounter() {
+            if (!isMatchSessionActive) {
+                let currentCount = parseInt(localStorage.getItem("refCoachTotalMatches")) || 0;
+                localStorage.setItem("refCoachTotalMatches", currentCount + 1);
+                updateMatchCounterUI();
+                isMatchSessionActive = true; 
+            }
+        }
 
         function toggleFullscreenLogs() {
             const container = document.getElementById("logHistoryContainer");
@@ -388,12 +431,6 @@
             document.getElementById("presetStatus").textContent = "Preloaded dashboard profile successfully imported.";
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem("refCoachPreset")) {
-                document.getElementById("presetStatus").textContent = "Saved configuration profile is available to load.";
-            }
-        });
-
         function toggleTheme() {
             const matchScreen = document.getElementById("matchScreen");
             const themeBtn = document.getElementById("themeToggleBtn");
@@ -437,6 +474,8 @@
             btnFoulB.textContent = config.teamBName;
             btnFoulB.style.backgroundColor = config.teamBColor;
             btnFoulB.style.color = getContrastColor(config.teamBColor);
+
+            incrementMatchCounter();
 
             document.getElementById("setupScreen").classList.add("hidden");
             document.getElementById("matchScreen").classList.remove("hidden");
@@ -849,6 +888,16 @@
             else if (source.includes('Yellow')) entry.style.borderColor = "#eab308";
             else entry.style.borderColor = "#3b82f6";
 
+            // Determine if card icons should display in heading next to the flag icon
+            let cardIcons = "";
+            if (source.includes('2nd Yellow')) {
+                cardIcons = " 🟨🟨=🟥";
+            } else if (source.includes('Yellow')) {
+                cardIcons = " 🟨";
+            } else if (source.includes('Red')) {
+                cardIcons = " 🟥";
+            }
+
             let displayItems = [];
             const hasOffside = source.includes('Offside') || source.includes('No Flag');
 
@@ -884,7 +933,7 @@
 
             entry.innerHTML = `
                 <div class="flex justify-between font-bold text-slate-200">
-                    <span class="tracking-wide">${timestamp} | ${role} (${assignedName}) ${hasOffside ? '🚩' : ''}</span>
+                    <span class="tracking-wide">${timestamp} | ${role} (${assignedName})${hasOffside ? ' 🚩' : ''}${cardIcons}</span>
                 </div>
                 <div class="text-slate-300 mt-1 font-sans text-xs">
                     ${compoundIncidents} [${metricDiff}] &mdash; <span class="italic font-black text-blue-400">${metricRating}</span> 
@@ -943,6 +992,8 @@
                 document.getElementById("startTimerBtn").textContent = "Start";
                 clearAllLogs();
                 resetUI();
+                isMatchSessionActive = false; 
+
                 document.getElementById("logHistoryContainer").classList.remove("fullscreen-logs");
                 document.getElementById("matchScreen").classList.remove("light-theme");
                 document.getElementById("themeToggleBtn").textContent = "☀️";
