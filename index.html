@@ -52,19 +52,27 @@
         }
 
         /* EXPANDABLE LOG HISTORY CONTROLLER */
-        #logHistoryContainer { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        #logHistoryContainer { transition: all 0.2s ease-out; }
         #logHistoryContainer.fullscreen-logs {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            height: 100% !important; max-height: 100% !important;
-            z-index: 50; background-color: #020617 !important;
+            position: fixed !important; 
+            top: 0 !important; 
+            left: 0 !important; 
+            right: 0 !important; 
+            bottom: 0 !important;
+            height: 100dvh !important; 
+            max-height: 100dvh !important;
+            min-height: 100dvh !important;
+            z-index: 50; 
+            background-color: #020617 !important;
             padding-top: env(safe-area-inset-top, 24px);
+            border-radius: 0px !important;
         }
 
         /* SWIPE GESTURE WRAPPERS */
-        .log-row-wrapper { position: relative; overflow: hidden; border-radius: 12px; }
+        .log-row-wrapper { position: relative; overflow: hidden; border-radius: 12px; flex-shrink: 0; }
         .log-entry { 
             position: relative; z-index: 10; transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1); 
-            background-color: #1e293b; border-left-width: 5px;
+            background-color: #1e293b; border-left-width: 5px; min-height: 58px;
         }
         .swipe-action-container {
             position: absolute; top: 0; bottom: 0; left: 0; right: 0;
@@ -90,7 +98,8 @@
         #matchScreen.light-theme .premium-card { background-color: rgba(255, 255, 255, 0.8) !important; border-color: #e2e8f0 !important; }
         #matchScreen.light-theme h2 { color: #64748b !important; }
         #matchScreen.light-theme #who-group button,
-        #matchScreen.light-theme #what-group button:not(.bg-orange-950\/40):not(.bg-yellow-950\/40):not(.bg-red-950\/40):not(.bg-green-950\/40):not(.bg-amber-950\/40) {
+        #matchScreen.light-theme #what-group button:not(.bg-orange-950\/40):not(.bg-yellow-950\/40):not(.bg-red-950\/40):not(.bg-green-950\/40):not(.bg-amber-950\/40),
+        #matchScreen.light-theme #more-incidents-container button:not(.bg-orange-950\/40):not(.bg-yellow-950\/40):not(.bg-red-950\/40):not(.bg-green-950\/40):not(.bg-amber-950\/40) {
             background-color: #ffffff !important; border-color: #cbd5e1 !important; color: #334155 !important;
         }
         #matchScreen.light-theme #foul-counter-dashboard { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
@@ -245,14 +254,19 @@
                 <div class="grid grid-cols-3 gap-2" id="what-group">
                     <button onclick="handleFoulToggle(this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-slate-200">Foul</button>
                     <button onclick="handleOffsideToggle(this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-slate-200">Offside</button>
-                    <button onclick="toggleMulti('what', 'Advantage', this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-slate-200">Adv.</button>
-                    <button onclick="handleCMIToggle('Penalty', this)" class="bg-orange-950/30 border border-orange-900/60 py-3.5 rounded-xl font-bold text-orange-400">Penalty</button>
-                    <button onclick="handleCMIToggle('Yellow', this)" class="bg-yellow-950/30 border border-yellow-800/60 py-3.5 rounded-xl font-bold text-yellow-400">Yellow</button>
-                    <button onclick="handleCMIToggle('Red', this)" class="bg-red-950/30 border border-red-900/60 py-3.5 rounded-xl font-bold text-red-400">Red Card</button>
-                    <button onclick="handleGoalToggle(this)" class="bg-green-950/30 border border-green-900/60 py-3.5 rounded-xl font-black text-green-400 text-sm col-span-1">⚽ Goal</button>
-                    <button onclick="handleCMIToggle('2nd Yellow', this)" class="bg-amber-950/30 border border-amber-900/60 py-3.5 rounded-xl font-bold text-amber-500 text-[10px] leading-tight">2nd Yellow</button>
-                    <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-[10px] text-slate-200 leading-tight">Mistaken ID</button>
+                    <button id="btnMoreIncidents" onclick="toggleMoreIncidents(this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-blue-400">More...</button>
                 </div>
+
+                <!-- HIDDEN SUBGROUP EXPANSION -->
+<div id="more-incidents-container" class="hidden grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-slate-800/60">
+    <button onclick="toggleMulti('what', 'Advantage', this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-slate-200 text-xs">Adv.</button>
+    <button onclick="handleCMIToggle('Penalty', this)" class="bg-orange-950/30 border border-orange-900/60 py-3.5 rounded-xl font-bold text-orange-400 text-xs">Penalty</button>
+    <button onclick="handleCMIToggle('Yellow', this)" class="bg-yellow-950/30 border border-yellow-800/60 py-3.5 rounded-xl font-bold text-yellow-400 text-xs">Yellow</button>
+    <button onclick="handleCMIToggle('Red', this)" class="bg-red-950/30 border border-red-900/60 py-3.5 rounded-xl font-bold text-red-400 text-xs">Red Card</button>
+    <button onclick="toggleMulti('what', 'Mistaken ID', this)" class="bg-slate-900 border border-slate-800 py-3.5 rounded-xl font-bold text-[10px] text-slate-200 leading-tight">Mistaken ID</button>
+    <button onclick="handleCMIToggle('2nd Yellow', this)" class="bg-amber-950/30 border border-amber-900/60 py-3.5 rounded-xl font-bold text-amber-500 text-[10px] leading-tight">2nd Yellow</button>
+    <button onclick="handleGoalToggle(this)" class="bg-green-950/30 border border-green-900/60 py-3.5 rounded-xl font-black text-green-400 text-xs col-span-3">⚽ Goal</button>
+</div>
             </section>
 
             <button id="noFlagBtn" onclick="toggleMulti('what', 'No Flag', this)" class="w-full bg-slate-900 border border-slate-800 py-3 rounded-xl font-bold text-xs text-indigo-400 hidden uppercase tracking-wider transition-all">
@@ -292,15 +306,19 @@
             </section>
         </main>
 
+        <!-- COMPACT EXPANDABLE DRAWER CONTAINER -->
         <div id="logHistoryContainer" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex flex-col bg-slate-900 border-t border-slate-800/80 min-h-[160px] max-h-[160px] z-30 rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,0px)]">
-            <div onclick="toggleFullscreenLogs()" class="p-3 px-4 flex justify-between items-center border-b border-slate-800/60 cursor-pointer select-none active:bg-slate-800/40 transition-all rounded-t-2xl">
+            <div onclick="toggleFullscreenLogs()" class="p-3 px-4 flex justify-between items-center border-b border-slate-800/60 cursor-pointer select-none active:bg-slate-800/40 transition-all rounded-t-2xl shrink-0">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                     📊 Match Log History <span class="text-[9px] font-medium text-blue-400 lowercase italic tracking-normal">(tap to toggle view)</span>
                 </span>
                 <button onclick="event.stopPropagation(); exportToCSV();" class="bg-gradient-to-r from-indigo-500 to-blue-600 active:from-indigo-600 active:to-blue-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-xl uppercase tracking-wider shadow-md">Export CSV</button>
             </div>
-            <div class="flex-1 bg-slate-950/40 p-3 overflow-y-auto font-mono text-[11px] flex flex-col gap-2 min-h-0 h-full" id="logList"></div>
-            <div onclick="resetTimer()" class="p-2.5 bg-slate-900 border-t border-slate-800/60 text-center text-[10px] text-red-400 font-bold uppercase tracking-widest cursor-pointer active:bg-red-950/20">Wipe and Close Match Engine</div>
+            
+            <!-- FIXED LOG LIST: FLEX GROW ENABLES NATURAL FILL + SCROLL -->
+            <div class="flex-1 bg-slate-950/40 p-3 overflow-y-auto font-mono text-[11px] flex flex-col gap-2 min-h-0" id="logList"></div>
+            
+            <div onclick="resetTimer()" class="p-2.5 bg-slate-900 border-t border-slate-800/60 text-center text-[10px] text-red-400 font-bold uppercase tracking-widest cursor-pointer active:bg-red-950/20 shrink-0">Wipe and Close Match Engine</div>
         </div>
     </div>
 
@@ -388,6 +406,12 @@
         function toggleFullscreenLogs() {
             const container = document.getElementById("logHistoryContainer");
             container.classList.toggle("fullscreen-logs");
+        }
+
+        function toggleMoreIncidents(element) {
+            const secondaryPanel = document.getElementById("more-incidents-container");
+            secondaryPanel.classList.toggle("hidden");
+            element.classList.toggle("selected", !secondaryPanel.classList.contains("hidden"));
         }
 
         function savePreset() {
@@ -499,7 +523,7 @@
 
         function handleFoulToggle(element) {
             if (currentSelection.what.includes('Goal')) {
-                const goalBtn = Array.from(document.querySelectorAll('#what-group button')).find(b => b.textContent.includes('Goal'));
+                const goalBtn = Array.from(document.querySelectorAll('#more-incidents-container button')).find(b => b.textContent.includes('Goal'));
                 if (goalBtn) goalBtn.classList.remove('selected');
                 currentSelection.what = currentSelection.what.filter(i => i !== 'Goal');
             }
@@ -685,7 +709,9 @@
 
         function clearMulti(cat) {
             currentSelection[cat] = [];
-            document.querySelectorAll(`#${cat}-group button`).forEach(b => b.classList.remove('selected', 'cmi-selected'));
+            document.querySelectorAll(`#${cat}-group button, #more-incidents-container button`).forEach(b => b.classList.remove('selected', 'cmi-selected'));
+            document.getElementById('btnMoreIncidents').classList.remove('selected');
+            document.getElementById('more-incidents-container').classList.add('hidden');
             document.getElementById('noFlagBtn').classList.add('hidden');
             animateSlidePanel('foul-team-container', false);
             document.getElementById('difficulty-options').classList.add('hidden');
@@ -888,7 +914,6 @@
             else if (source.includes('Yellow')) entry.style.borderColor = "#eab308";
             else entry.style.borderColor = "#3b82f6";
 
-            // Determine if card icons should display in heading next to the flag icon
             let cardIcons = "";
             if (source.includes('2nd Yellow')) {
                 cardIcons = " 🟨🟨=🟥";
@@ -980,6 +1005,7 @@
             document.getElementById('noFlagBtn').classList.add('hidden');
             document.getElementById('foul-team-container').classList.add('hidden');
             document.getElementById('difficulty-options').classList.add('hidden');
+            document.getElementById('more-incidents-container').classList.add('hidden');
             document.getElementById('quickNote').value = "";
             showOfficialAndEvaluationSections(true);
         }
